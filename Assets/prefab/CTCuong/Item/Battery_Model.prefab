@@ -63,7 +63,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: ec09b767fe0c6544dbb316780341a4ea, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 1b18daddb0833ff469970785a9a22f71, type: 2}
+      objectReference: {fileID: 2100000, guid: a931c2cfd341fe2418f967b031f481fd, type: 2}
     - target: {fileID: 919132149155446097, guid: ec09b767fe0c6544dbb316780341a4ea, type: 3}
       propertyPath: m_Name
       value: Battery_Model
