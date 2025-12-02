@@ -849,6 +849,7 @@ Transform:
   - {fileID: 2110753196}
   - {fileID: 594635599}
   - {fileID: 81118068}
+  - {fileID: 1728090820}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1672146494
@@ -869,7 +870,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5743109673324456106, guid: cf322d6ff7ae16a418e22fd66652549b, type: 3}
       propertyPath: m_TagString
-      value: Player
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 6533423420632814833, guid: cf322d6ff7ae16a418e22fd66652549b, type: 3}
       propertyPath: m_Avatar
@@ -923,6 +924,37 @@ PrefabInstance:
       addedObject: {fileID: 1111907509}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cf322d6ff7ae16a418e22fd66652549b, type: 3}
+--- !u!1 &1728090819
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1728090820}
+  m_Layer: 0
+  m_Name: Point1 (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1728090820
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1728090819}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -13.49, y: 0, z: -10.89}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1568993807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2043250349 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 885886589382987403, guid: cf322d6ff7ae16a418e22fd66652549b, type: 3}
@@ -971,6 +1003,10 @@ PrefabInstance:
       propertyPath: managedReferences[4032484876346982694].m_Value
       value: 
       objectReference: {fileID: 470883852}
+    - target: {fileID: 1054050518437472698, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: managedReferences[4032484876346982697].m_Value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3704466872015166423, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 
@@ -983,6 +1019,10 @@ PrefabInstance:
       propertyPath: 'patrolPoints.Array.data[2]'
       value: 
       objectReference: {fileID: 81118068}
+    - target: {fileID: 3704466872015166423, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: 'patrolPoints.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1728090820}
     - target: {fileID: 5789109124025534499, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.6217515
@@ -1027,6 +1067,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 8004475823112005841, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: detectRange
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8538499410918368327, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: targetPlayer
+      value: 
+      objectReference: {fileID: 2043250349}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

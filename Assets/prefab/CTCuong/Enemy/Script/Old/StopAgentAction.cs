@@ -6,7 +6,7 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Stop Agent (Anti-Slide)", story: "Stop movement immediately", category: "Action/Navigation", id: "StopAgentAntiSlide")]
+[NodeDescription(name: "Stop Agent", story: "Stop moving immediately", category: "Action/Navigation", id: "StopAgent")]
 public partial class StopAgentAction : Action
 {
     protected override Status OnStart()
@@ -14,10 +14,9 @@ public partial class StopAgentAction : Action
         NavMeshAgent agent = GameObject.GetComponent<NavMeshAgent>();
         if (agent != null)
         {
-            agent.isStopped = true;        // 1. Ngắt động cơ
-            agent.velocity = Vector3.zero; // 2. TRIỆT TIÊU QUÁN TÍNH (Chống trượt)
-            return Status.Success;
+            agent.isStopped = true; // Ra lệnh dừng lại
+            agent.ResetPath();      // Xóa đường đi cũ
         }
-        return Status.Failure;
+        return Status.Success;
     }
 }
