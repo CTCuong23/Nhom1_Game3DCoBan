@@ -1076,6 +1076,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4026352134867131653}
     - target: {fileID: 8034681978962182244, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: maxPitch
+      value: 0.968
+      objectReference: {fileID: 0}
+    - target: {fileID: 8034681978962182244, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
       propertyPath: alertSound
       value: 
       objectReference: {fileID: 8300000, guid: 3ca37c22223db3748a0c4b5b7bae83df, type: 3}
@@ -1087,6 +1091,10 @@ PrefabInstance:
       propertyPath: footstepSound
       value: 
       objectReference: {fileID: 8300000, guid: 83ed1a0be1c243f439ebf99aa593b5e6, type: 3}
+    - target: {fileID: 8034681978962182244, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: footstepVolume
+      value: 0.07
+      objectReference: {fileID: 0}
     - target: {fileID: 8538499410918368327, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
       propertyPath: targetPlayer
       value: 
