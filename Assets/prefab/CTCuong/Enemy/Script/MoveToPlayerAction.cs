@@ -22,6 +22,13 @@ public partial class MoveToPlayerAction : Action
         agent = GameObject.GetComponent<NavMeshAgent>();
         if (agent == null) return Status.Failure;
 
+        // Tìm script EnemySound và gọi tiếng báo động
+        EnemySound soundScript = GameObject.GetComponent<EnemySound>();
+        if (soundScript != null)
+        {
+            soundScript.PlayAlertSound();
+        }
+
         agent.speed = Speed.Value;
         agent.isStopped = false;
 
