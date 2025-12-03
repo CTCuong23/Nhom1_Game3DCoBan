@@ -179,6 +179,63 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1557006646}
   m_SourcePrefab: {fileID: 100100000, guid: ddfc1292959bce64f8c5c758157712f1, type: 3}
+--- !u!1001 &32591182
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 502601985995600905, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_Name
+      value: Battery_Model
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 75.49338
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.1540611
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 427.88068
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5467898
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.54621524
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.44807708
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.4493293
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -89.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 986932063059586739, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -78.824
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 88c500a196b4ee3478c994a3c01dd77c, type: 3}
 --- !u!1001 &38989658
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1709,22 +1766,13 @@ MonoBehaviour:
   vCam: {fileID: 521261505}
   mainCamera: {fileID: 664797876}
   centerCrosshair: {fileID: 736581362}
-  normalColor: {r: 1, g: 1, b: 1, a: 0.2}
-  zoomModeColor: {r: 0.6830188, g: 0.27707362, b: 0.27707362, a: 0.41960785}
+  centerCrosshairHover: {fileID: 0}
   handCursor: {fileID: 1572493674}
-  handNormalColor: {r: 0, g: 0.7580867, b: 1, a: 0.50980395}
-  handHoverColor: {r: 0, g: 1, b: 0, a: 1}
-  interactionDistance: 100
+  handHover: {fileID: 0}
   interactableLayer:
     serializedVersion: 2
     m_Bits: 0
-  zoomFOV: 20
-  zoomDistance: 2
   zoomSide: 1
-  zoomOffset: {x: 0.7, y: 0.29, z: 0.67}
-  zoomDamping: {x: 0.1, y: 0.25, z: 0.3}
-  smoothSpeed: 10
-  mouseSensitivityMultiplier: 0.2
 --- !u!1 &669396574 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3485773276523611762, guid: ddfc1292959bce64f8c5c758157712f1, type: 3}
@@ -3207,6 +3255,7 @@ MonoBehaviour:
   loadingBar: {fileID: 1496340790}
   timerText: {fileID: 1365404325}
   currentItems: 0
+  isAiming: 0
 --- !u!4 &1264519989
 Transform:
   m_ObjectHideFlags: 0
@@ -5432,3 +5481,4 @@ SceneRoots:
   - {fileID: 1413687728}
   - {fileID: 1264519989}
   - {fileID: 1749387544}
+  - {fileID: 32591182}
