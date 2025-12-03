@@ -53,9 +53,6 @@ namespace StarterAssets
 
         public void LookInput(Vector2 newLookDirection)
         {
-            // --- ĐÃ CHỈNH SỬA BỞI GEMINI ---
-            // Nhân thêm hệ số sensitivity từ CameraZoom để làm chậm chuột khi ngắm
-            // CameraZoom.CurrentSensitivityFactor sẽ tự động thay đổi khi bạn ấn phím 1
             float sensitivity = CameraZoom.CurrentSensitivityFactor;
             look = newLookDirection * sensitivity;
         }

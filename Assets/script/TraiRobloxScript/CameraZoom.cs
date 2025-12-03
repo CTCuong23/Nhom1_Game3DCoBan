@@ -1,53 +1,46 @@
 ﻿using UnityEngine;
 using Cinemachine;
 using UnityEngine.UI;
-// Không cần thư viện StarterAssets ở đây nữa vì ta không can thiệp vào Input
 
 public class CameraZoom : MonoBehaviour
 {
     [Header("Components")]
-    public CinemachineVirtualCamera vCam;
-    public Camera mainCamera;
+    [SerializeField] CinemachineVirtualCamera vCam;
+    [SerializeField] Camera mainCamera;
 
     [Header("UI Crosshair (Tâm thường)")]
-    public Image centerCrosshair;
-    public Color normalColor = new Color(1, 1, 1, 0.2f); // Màu tâm thường
-    public Color zoomModeColor = new Color(1, 1, 1, 0f); // Ẩn tâm thường khi zoom (alpha = 0)
+    [SerializeField] Image centerCrosshair;       // Kéo cái CrossHair (Màu trắng) vào đây
+    [SerializeField] Image centerCrosshairHover;  // Kéo cái CrossHairHover (Màu xanh) vào đây
 
     [Header("UI Hand Cursor (Bàn tay Tâm ngắm)")]
-    public Image handCursor;            // Kéo hình Bàn Tay vào đây
-    public Color handNormalColor = Color.white;
-    public Color handHoverColor = Color.green; // Màu xanh khi chĩa vào đồ vật
+    [SerializeField] Image handCursor;      // Bàn tay mặc định (Màu trắng/Mở)
+    [SerializeField] Image handHover;       // Bàn tay khi tương tác (Màu đỏ/Nắm)
 
     [Header("Interaction (Tương tác)")]
-    public float interactionDistance = 100f;
-    public LayerMask interactableLayer;
+    private float interactionDistance = 5f;
+    [SerializeField] LayerMask interactableLayer;
+    private float interactionRadius = 0.07f;
 
     [Header("Zoom Settings")]
-    public float zoomFOV = 20f;
-    public float zoomDistance = 2.0f;
+    private float zoomFOV = 20f;
+    private float zoomDistance = 2.0f;
     [Range(0, 1)] public float zoomSide = 1.0f;
-    public Vector3 zoomOffset = new Vector3(0.7f, 0.29f, 0.67f);
-    public Vector3 zoomDamping = new Vector3(0.1f, 0.25f, 0.3f);
-    public float smoothSpeed = 10f;
+    private Vector3 zoomOffset = new Vector3(0.7f, 0.29f, 0.67f);
+    private Vector3 zoomDamping = Vector3.zero;
+    private float smoothSpeed = 10f;
 
     [Header("Sensitivity")]
-    [Range(0.1f, 1f)] public float mouseSensitivityMultiplier = 0.2f;
+    [Range(0.1f, 1f)] private float mouseSensitivityMultiplier = 0.2f;
 
-    // Biến này để StarterAssetsInputs đọc (làm chậm chuột)
     public static float CurrentSensitivityFactor = 1f;
 
     // Private variables
     private float defaultFOV;
     private float defaultDistance;
-    private float defaultSide;
     private Vector3 defaultOffset;
     private Vector3 defaultDamping;
     private bool isZooming = false;
     private Cinemachine3rdPersonFollow thirdPersonComponent;
-
-    // Vị trí gốc của bàn tay (để giữ nó ở giữa màn hình)
-    private Vector3 initialHandPos;
 
     void Start()
     {
@@ -60,19 +53,20 @@ public class CameraZoom : MonoBehaviour
         {
             defaultFOV = vCam.m_Lens.FieldOfView;
             defaultDistance = thirdPersonComponent.CameraDistance;
-            defaultSide = thirdPersonComponent.CameraSide;
             defaultOffset = thirdPersonComponent.ShoulderOffset;
             defaultDamping = thirdPersonComponent.Damping;
         }
 
-        if (centerCrosshair != null) centerCrosshair.color = normalColor;
+        // --- SỬA LỖI 1: XÓA DÒNG GÁN BIẾN SAI Ở ĐÂY ---
+        // (Đã xóa dòng: if (centerCrosshair != null) centerCrosshair = centerCrosshairHover;)
 
-        if (handCursor != null)
-        {
-            handCursor.gameObject.SetActive(false); // Ẩn bàn tay đi lúc đầu
-            // Lưu vị trí giữa màn hình của bàn tay (nếu bạn đã đặt nó ở giữa trong Canvas)
-            initialHandPos = handCursor.rectTransform.localPosition;
-        }
+        // Khởi đầu: Chưa Zoom thì hiện Tâm thường (Trắng), ẩn Tâm Hover (Xanh)
+        if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(true);
+        if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(false);
+
+        // Ẩn cả 2 bàn tay lúc đầu
+        if (handCursor != null) handCursor.gameObject.SetActive(false);
+        if (handHover != null) handHover.gameObject.SetActive(false);
     }
 
     void Update()
@@ -83,6 +77,9 @@ public class CameraZoom : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             isZooming = !isZooming;
+            GameManager.instance.isAiming = !GameManager.instance.isAiming;
+
+            // Cập nhật hiển thị UI
             UpdateCrosshairVisuals();
         }
 
@@ -96,41 +93,84 @@ public class CameraZoom : MonoBehaviour
         ApplyZoomPhysics();
     }
 
+    // --- SỬA LỖI 2: DÙNG SetActive ĐỂ BẬT TẮT ---
     void UpdateCrosshairVisuals()
     {
-        // Khi Zoom: Ẩn tâm vuông, Hiện bàn tay
-        // Khi Tắt: Hiện tâm vuông, Ẩn bàn tay
-        if (centerCrosshair != null)
-            centerCrosshair.color = isZooming ? zoomModeColor : normalColor;
+        // Xử lý Tâm ngắm giữa màn hình
+        if (isZooming)
+        {
+            // Đang ngắm -> Ẩn tâm trắng, Hiện tâm xanh
+            if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(false);
+            if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(true);
+        }
+        else
+        {
+            // Không ngắm -> Hiện tâm trắng, Ẩn tâm xanh
+            if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(true);
+            if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(false);
+        }
 
-        if (handCursor != null)
-            handCursor.gameObject.SetActive(isZooming);
+        // Xử lý Bàn tay (Giữ nguyên logic của bạn)
+        if (isZooming)
+        {
+            if (handCursor != null) handCursor.gameObject.SetActive(true);
+            if (handHover != null) handHover.gameObject.SetActive(false);
+        }
+        else
+        {
+            if (handCursor != null) handCursor.gameObject.SetActive(false);
+            if (handHover != null) handHover.gameObject.SetActive(false);
+        }
     }
 
     void HandleCenterInteraction()
     {
-        // Bắn tia từ CHÍNH GIỮA màn hình (0.5, 0.5)
         Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
-        // Kiểm tra va chạm
-        if (Physics.Raycast(ray, out hit, interactionDistance, interactableLayer))
+        if (Physics.SphereCast(ray, interactionRadius, out hit, interactionDistance, interactableLayer))
         {
-            // Trúng đồ vật -> Đổi màu bàn tay thành XANH
-            if (handCursor != null) handCursor.color = handHoverColor;
+            InteractableObject obj = hit.collider.GetComponent<InteractableObject>();
 
-            // Bấm chuột trái để tương tác
-            if (Input.GetMouseButtonDown(0))
+            if (obj != null)
             {
-                Debug.Log("Đã tương tác với: " + hit.collider.name);
-                // GỌI HÀM LOGIC CỦA BẠN Ở ĐÂY
+                // Có vật phẩm -> Tắt tay thường, Bật tay đỏ
+                if (handCursor != null) handCursor.gameObject.SetActive(false);
+                if (handHover != null) handHover.gameObject.SetActive(true);
+
+                // --- LOGIC HIGHLIGHT CŨ CỦA BẠN (Cứ để comment nếu chưa dùng) ---
+                /*
+                InteractableHighlight highlight = hit.collider.GetComponent<InteractableHighlight>();
+                if (highlight != null)
+                {
+                   if (currentHighlightObj != highlight)
+                   {
+                       if (currentHighlightObj != null) currentHighlightObj.ToggleHighlight(false);
+                       currentHighlightObj = highlight;
+                       currentHighlightObj.ToggleHighlight(true);
+                   }
+                }
+                */
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Debug.Log("Đã tương tác với: " + hit.collider.name);
+                }
+                return;
             }
         }
-        else
+
+        // Không trúng gì -> Bật lại tay thường
+        if (handCursor != null) handCursor.gameObject.SetActive(true);
+        if (handHover != null) handHover.gameObject.SetActive(false);
+
+        /*
+        if (currentHighlightObj != null)
         {
-            // Không trúng gì -> Bàn tay màu TRẮNG
-            if (handCursor != null) handCursor.color = handNormalColor;
+            currentHighlightObj.ToggleHighlight(false);
+            currentHighlightObj = null;
         }
+        */
     }
 
     void ApplyZoomPhysics()
