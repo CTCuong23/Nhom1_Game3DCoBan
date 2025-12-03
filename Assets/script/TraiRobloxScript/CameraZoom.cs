@@ -9,17 +9,23 @@ public class CameraZoom : MonoBehaviour
     [SerializeField] Camera mainCamera;
 
     [Header("UI Crosshair (Tâm thường)")]
-    [SerializeField] Image centerCrosshair;       // Kéo cái CrossHair (Màu trắng) vào đây
-    [SerializeField] Image centerCrosshairHover;  // Kéo cái CrossHairHover (Màu xanh) vào đây
+    [SerializeField] Image centerCrosshair;
+    [SerializeField] Image centerCrosshairHover;
 
     [Header("UI Hand Cursor (Bàn tay Tâm ngắm)")]
-    [SerializeField] Image handCursor;      // Bàn tay mặc định (Màu trắng/Mở)
-    [SerializeField] Image handHover;       // Bàn tay khi tương tác (Màu đỏ/Nắm)
+    [SerializeField] Image handCursor;
+    [SerializeField] Image handHover;
 
     [Header("Interaction (Tương tác)")]
-    private float interactionDistance = 5f;
+    public float interactionDistance = 5f;
     [SerializeField] LayerMask interactableLayer;
-    private float interactionRadius = 0.07f;
+    public float interactionRadius = 0.07f;
+
+    // --- THÊM BIẾN ĐẾM THỜI GIAN GIỮ E ---
+    private float currentHoldTime = 0f;
+
+    // Biến lưu vật phẩm đang được Highlight
+    //private InteractableHighlight currentHighlightObj;
 
     [Header("Zoom Settings")]
     private float zoomFOV = 20f;
@@ -57,14 +63,9 @@ public class CameraZoom : MonoBehaviour
             defaultDamping = thirdPersonComponent.Damping;
         }
 
-        // --- SỬA LỖI 1: XÓA DÒNG GÁN BIẾN SAI Ở ĐÂY ---
-        // (Đã xóa dòng: if (centerCrosshair != null) centerCrosshair = centerCrosshairHover;)
-
-        // Khởi đầu: Chưa Zoom thì hiện Tâm thường (Trắng), ẩn Tâm Hover (Xanh)
         if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(true);
         if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(false);
 
-        // Ẩn cả 2 bàn tay lúc đầu
         if (handCursor != null) handCursor.gameObject.SetActive(false);
         if (handHover != null) handHover.gameObject.SetActive(false);
     }
@@ -79,7 +80,9 @@ public class CameraZoom : MonoBehaviour
             isZooming = !isZooming;
             GameManager.instance.isAiming = !GameManager.instance.isAiming;
 
-            // Cập nhật hiển thị UI
+            // Reset trạng thái tương tác khi tắt bật
+            if (!isZooming) ResetInteraction();
+
             UpdateCrosshairVisuals();
         }
 
@@ -93,31 +96,19 @@ public class CameraZoom : MonoBehaviour
         ApplyZoomPhysics();
     }
 
-    // --- SỬA LỖI 2: DÙNG SetActive ĐỂ BẬT TẮT ---
     void UpdateCrosshairVisuals()
     {
-        // Xử lý Tâm ngắm giữa màn hình
         if (isZooming)
         {
-            // Đang ngắm -> Ẩn tâm trắng, Hiện tâm xanh
             if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(false);
             if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(true);
-        }
-        else
-        {
-            // Không ngắm -> Hiện tâm trắng, Ẩn tâm xanh
-            if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(true);
-            if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(false);
-        }
-
-        // Xử lý Bàn tay (Giữ nguyên logic của bạn)
-        if (isZooming)
-        {
             if (handCursor != null) handCursor.gameObject.SetActive(true);
             if (handHover != null) handHover.gameObject.SetActive(false);
         }
         else
         {
+            if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(true);
+            if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(false);
             if (handCursor != null) handCursor.gameObject.SetActive(false);
             if (handHover != null) handHover.gameObject.SetActive(false);
         }
@@ -134,36 +125,81 @@ public class CameraZoom : MonoBehaviour
 
             if (obj != null)
             {
-                // Có vật phẩm -> Tắt tay thường, Bật tay đỏ
+                // A. XỬ LÝ UI IMAGE
                 if (handCursor != null) handCursor.gameObject.SetActive(false);
                 if (handHover != null) handHover.gameObject.SetActive(true);
 
-                // --- LOGIC HIGHLIGHT CŨ CỦA BẠN (Cứ để comment nếu chưa dùng) ---
+                // B. XỬ LÝ HIGHLIGHT (Code cũ của bạn)
                 /*
                 InteractableHighlight highlight = hit.collider.GetComponent<InteractableHighlight>();
-                if (highlight != null)
+                if (highlight != null && currentHighlightObj != highlight)
                 {
-                   if (currentHighlightObj != highlight)
-                   {
-                       if (currentHighlightObj != null) currentHighlightObj.ToggleHighlight(false);
-                       currentHighlightObj = highlight;
-                       currentHighlightObj.ToggleHighlight(true);
-                   }
+                    if (currentHighlightObj != null) currentHighlightObj.ToggleHighlight(false);
+                    currentHighlightObj = highlight;
+                    currentHighlightObj.ToggleHighlight(true);
                 }
                 */
 
-                if (Input.GetMouseButtonDown(0))
+                // --- C. HIỆN GỢI Ý & GIỮ E (MỚI THÊM VÀO) ---
+
+                // 1. Hiện chữ "Giữ E để nhặt"
+                if (obj.type == InteractableObject.ObjectType.Item)
+                    GameManager.instance.ShowHint("Giữ E để nhặt");
+                else if (obj.type == InteractableObject.ObjectType.Door)
                 {
-                    Debug.Log("Đã tương tác với: " + hit.collider.name);
+                    if (GameManager.instance.currentItems >= 3)
+                        GameManager.instance.ShowHint("Vật phẩm: 3/3\nGiữ E để thoát");
+                    else
+                        GameManager.instance.ShowHint($"Chưa đủ đồ ({GameManager.instance.currentItems}/3)");
                 }
-                return;
+
+                // 2. Logic Giữ phím E
+                // (Chỉ cho phép giữ nếu là Item hoặc là Cửa đã đủ đồ)
+                bool canInteract = (obj.type == InteractableObject.ObjectType.Item) ||
+                                   (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.currentItems >= 3);
+
+                if (canInteract && Input.GetKey(KeyCode.E))
+                {
+                    currentHoldTime += Time.deltaTime;
+                    GameManager.instance.UpdateLoading(currentHoldTime, obj.holdTime);
+
+                    if (currentHoldTime >= obj.holdTime)
+                    {
+                        obj.PerformAction(); // Nhặt đồ hoặc Thắng game
+                        ResetInteraction();  // Reset sau khi xong
+                    }
+                }
+                else
+                {
+                    // Thả tay ra thì reset loading
+                    if (currentHoldTime > 0)
+                    {
+                        currentHoldTime = 0f;
+                        GameManager.instance.StopLoading();
+                    }
+                }
+
+                return; // Kết thúc hàm tại đây
             }
         }
 
-        // Không trúng gì -> Bật lại tay thường
+        // --- NẾU KHÔNG NGẮM TRÚNG GÌ ---
+        ResetInteraction();
+    }
+
+    // Hàm phụ để dọn dẹp trạng thái khi không nhìn thấy vật phẩm
+    void ResetInteraction()
+    {
+        // Trả lại UI mặc định
         if (handCursor != null) handCursor.gameObject.SetActive(true);
         if (handHover != null) handHover.gameObject.SetActive(false);
 
+        // Tắt chữ gợi ý và Loading
+        GameManager.instance.HideHint();
+        GameManager.instance.StopLoading();
+        currentHoldTime = 0f;
+
+        // Tắt Highlight (nếu đang dùng)
         /*
         if (currentHighlightObj != null)
         {
