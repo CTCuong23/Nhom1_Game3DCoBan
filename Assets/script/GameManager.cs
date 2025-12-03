@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public int currentItems = 0;
     private int totalItems = 3;
 
+    public bool isAiming = false;
+
     void Awake()
     {
         // Setup Singleton

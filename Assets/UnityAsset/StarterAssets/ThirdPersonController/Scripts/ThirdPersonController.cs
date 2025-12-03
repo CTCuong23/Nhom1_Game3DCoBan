@@ -206,9 +206,6 @@ namespace StarterAssets
             _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
             _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
 
-            // --- ĐÃ XÓA DÒNG CODE THỪA Ở ĐÂY (CameraZoom.CurrentSensitivityFactor;) ---
-            // Vì logic đã được xử lý bên StarterAssetsInputs rồi
-
             // Cinemachine will follow this target
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
                 _cinemachineTargetYaw, 0.0f);
