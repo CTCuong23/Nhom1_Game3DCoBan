@@ -369,14 +369,28 @@ namespace StarterAssets
                 GroundedRadius);
         }
 
+        // Tìm đến dòng khoảng 370-380, thay thế toàn bộ hàm OnFootstep cũ bằng hàm này:
         private void OnFootstep(AnimationEvent animationEvent)
         {
+            // --- FIX AN TOÀN ---
+            // 1. Kiểm tra xem CharacterController có tồn tại không. Nếu null thì bỏ qua ngay.
+            if (_controller == null) return;
+
+            // 2. Kiểm tra danh sách âm thanh. Nếu rỗng thì nghỉ.
+            if (FootstepAudioClips == null || FootstepAudioClips.Length == 0) return;
+            // -------------------
+
             if (animationEvent.animatorClipInfo.weight > 0.5f)
             {
                 if (FootstepAudioClips.Length > 0)
                 {
                     var index = Random.Range(0, FootstepAudioClips.Length);
-                    AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
+
+                    // 3. Kiểm tra kỹ file âm thanh trước khi phát
+                    if (FootstepAudioClips[index] != null)
+                    {
+                        AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                    }
                 }
             }
         }

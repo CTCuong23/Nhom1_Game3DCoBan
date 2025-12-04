@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-
+using UnityEngine.Playables;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector] public int currentItems = 0;
     private int totalItems = 3;
+    public MonoBehaviour playerMovementScript; 
+    public Animator playerAnimator;
 
     public bool isAiming = false;
 
@@ -95,10 +97,38 @@ public class GameManager : MonoBehaviour
         if (hintText.text != "") hintText.gameObject.SetActive(true);
     }
 
+    
+    public void StartEndingSequence(PlayableDirector director)
+    {
+        
+        if (playerMovementScript != null)
+        {
+            playerMovementScript.enabled = false;
+        }
+
+        
+        HideHint();
+        interactionPanel.SetActive(false);
+
+      
+        if (director != null)
+        {
+            director.Play();
+        }
+    }
     public void WinGame()
     {
-        StopLoading(); 
         winText.gameObject.SetActive(true);
-        Time.timeScale = 0;
+
+        if (playerMovementScript != null)
+        {
+            playerMovementScript.enabled = false;
+        }
+
+       
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+       
     }
 }
