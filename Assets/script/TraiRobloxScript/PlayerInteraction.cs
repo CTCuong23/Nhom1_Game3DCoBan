@@ -2,96 +2,72 @@
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [Header("Cài đặt")]
-    public float interactionRange = 3f; // Khoảng cách tương tác (ví dụ 3 mét)
-    public LayerMask interactableLayer; // Layer của vật phẩm (để tránh bắn tia vào sàn nhà/tường)
+    // Script này chỉ chuyên xử lý việc đi vào vùng Trigger (Cửa)
 
     private float currentHoldTime = 0f;
-    private InteractableObject currentTarget; // Vật phẩm đang được nhìn thấy
-    public float interactionRadius = 0.07f; // Bán kính của SphereCast
+    private InteractableObject currentZoneTarget; // Cửa đang đứng gần
 
-    void Update()
+    // Khi Player đi vào vùng Trigger (InteractionZone)
+    private void OnTriggerStay(Collider other)
     {
-        // 1. Nếu chưa bật tâm ngắm -> Reset hết và không làm gì cả
-        if (!GameManager.instance.isAiming)
+        // 1. Kiểm tra xem cái mình đụng trúng có phải là Cửa không
+        InteractableObject obj = other.GetComponent<InteractableObject>();
+
+        // Chỉ xử lý nếu là DOOR
+        if (obj != null && obj.type == InteractableObject.ObjectType.Door)
         {
-            ResetInteraction();
-            return;
-        }
+            currentZoneTarget = obj;
 
-        // 2. Bắn tia Raycast từ giữa màn hình (Camera)
-        Ray ray = new Ray(transform.position, transform.forward);
-        RaycastHit hit;
-
-        // Bắn tia ra xa interactionRange mét
-        if (Physics.SphereCast(ray, interactionRadius, out hit, interactionRange, interactableLayer))
-        {
-            // Kiểm tra xem vật bị bắn trúng có script InteractableObject không
-            InteractableObject obj = hit.collider.GetComponent<InteractableObject>();
-
-            if (obj != null)
+            // 2. Logic điều kiện thắng
+            if (GameManager.instance.currentItems < 3)
             {
-                // Nếu nhìn thấy vật phẩm mới hoặc vẫn là vật phẩm cũ
-                HandleInteraction(obj);
+                // Chưa đủ đồ
+                GameManager.instance.ShowHint(obj.GetHintText());
+                return; // Không cho giữ E
+            }
+
+            // 3. Đủ đồ -> Hiện gợi ý
+            GameManager.instance.ShowHint(obj.GetHintText());
+
+            // 4. Kiểm tra giữ E
+            if (Input.GetKey(KeyCode.E))
+            {
+                currentHoldTime += Time.deltaTime;
+                GameManager.instance.UpdateLoading(currentHoldTime, obj.holdTime);
+
+                if (currentHoldTime >= obj.holdTime)
+                {
+                    obj.PerformAction(); // Mở cửa & Cutscene
+                    ResetDoorInteraction(); // Reset ngay để tránh gọi nhiều lần
+                }
             }
             else
             {
-                // Nhìn vào tường hoặc vật không tương tác được
-                ResetInteraction();
-            }
-        }
-        else
-        {
-            // Không nhìn thấy gì
-            ResetInteraction();
-        }
-    }
-
-    void HandleInteraction(InteractableObject obj)
-    {
-        currentTarget = obj;
-
-        // Logic đặc biệt cho Cửa: Nếu chưa đủ đồ thì không cho tương tác
-        if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.currentItems < 3)
-        {
-            GameManager.instance.ShowHint(obj.GetHintText()); // Chỉ hiện chữ, không cho giữ E
-            return;
-        }
-
-        // Hiện gợi ý
-        GameManager.instance.ShowHint(obj.GetHintText());
-
-        // Kiểm tra giữ phím E
-        if (Input.GetKey(KeyCode.E))
-        {
-            currentHoldTime += Time.deltaTime;
-            GameManager.instance.UpdateLoading(currentHoldTime, obj.holdTime);
-
-            if (currentHoldTime >= obj.holdTime)
-            {
-                obj.PerformAction(); // Thực hiện hành động nhặt/mở
-                ResetInteraction();  // Reset sau khi nhặt xong
-            }
-        }
-        else
-        {
-            // Nếu thả tay ra thì reset thanh loading
-            if (currentHoldTime > 0)
-            {
-                currentHoldTime = 0f;
-                GameManager.instance.StopLoading();
+                // Thả tay ra -> Reset loading
+                if (currentHoldTime > 0)
+                {
+                    currentHoldTime = 0f;
+                    GameManager.instance.StopLoading();
+                }
             }
         }
     }
 
-    void ResetInteraction()
+    // Khi Player đi ra khỏi vùng Trigger
+    private void OnTriggerExit(Collider other)
     {
-        if (currentTarget != null || currentHoldTime > 0)
+        InteractableObject obj = other.GetComponent<InteractableObject>();
+        if (obj != null && obj == currentZoneTarget)
         {
-            GameManager.instance.HideHint();
-            GameManager.instance.StopLoading();
-            currentHoldTime = 0f;
-            currentTarget = null;
+            ResetDoorInteraction();
         }
+    }
+
+    void ResetDoorInteraction()
+    {
+        GameManager.instance.HideHint();
+        GameManager.instance.StopLoading();
+        currentHoldTime = 0f;
+        currentZoneTarget = null;
     }
 }
