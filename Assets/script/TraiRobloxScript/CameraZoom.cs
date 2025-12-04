@@ -4,6 +4,12 @@ using UnityEngine.UI;
 
 public class CameraZoom : MonoBehaviour
 {
+    [Header("Highlight Settings")]
+    [SerializeField] Material highlightMaterial; // <-- Kéo cái Material EdgeGlow bạn vừa tạo vào đây
+    private InteractableObject currentHighlightObj; // Vật đang được highlight
+    private Material originalMaterial; // Material gốc của vật (để trả lại sau khi thôi ngắm)
+    private Renderer currentRenderer; // Renderer của vật
+
     [Header("Components")]
     [SerializeField] CinemachineVirtualCamera vCam;
     [SerializeField] Camera mainCamera;
@@ -23,9 +29,6 @@ public class CameraZoom : MonoBehaviour
 
     // --- THÊM BIẾN ĐẾM THỜI GIAN GIỮ E ---
     private float currentHoldTime = 0f;
-
-    // Biến lưu vật phẩm đang được Highlight
-    //private InteractableHighlight currentHighlightObj;
 
     [Header("Zoom Settings")]
     private float zoomFOV = 20f;
@@ -125,24 +128,29 @@ public class CameraZoom : MonoBehaviour
 
             if (obj != null)
             {
-                // A. XỬ LÝ UI IMAGE
+                // A. XỬ LÝ UI IMAGE (Giữ nguyên code của bạn)
                 if (handCursor != null) handCursor.gameObject.SetActive(false);
                 if (handHover != null) handHover.gameObject.SetActive(true);
 
-                // B. XỬ LÝ HIGHLIGHT (Code cũ của bạn)
-                /*
-                InteractableHighlight highlight = hit.collider.GetComponent<InteractableHighlight>();
-                if (highlight != null && currentHighlightObj != highlight)
+                // --- B. XỬ LÝ HIGHLIGHT (CODE MỚI) ---
+                // Nếu vật này KHÁC vật đang highlight hiện tại
+                if (obj != currentHighlightObj)
                 {
-                    if (currentHighlightObj != null) currentHighlightObj.ToggleHighlight(false);
-                    currentHighlightObj = highlight;
-                    currentHighlightObj.ToggleHighlight(true);
+                    // 1. Trả lại trạng thái cũ cho vật trước đó (nếu có)
+                    ResetHighlightEffect();
+
+                    // 2. Gán vật mới và bật sáng
+                    currentHighlightObj = obj;
+                    currentRenderer = obj.GetComponent<Renderer>();
+
+                    if (currentRenderer != null && highlightMaterial != null)
+                    {
+                        originalMaterial = currentRenderer.material; // Lưu cái áo cũ
+                        currentRenderer.material = highlightMaterial; // Mặc cái áo phát sáng vào
+                    }
                 }
-                */
 
-                // --- C. HIỆN GỢI Ý & GIỮ E (MỚI THÊM VÀO) ---
-
-                // 1. Hiện chữ "Giữ E để nhặt"
+                // --- C. HIỆN GỢI Ý & GIỮ E (Giữ nguyên code của bạn) ---
                 if (obj.type == InteractableObject.ObjectType.Item)
                     GameManager.instance.ShowHint("Giữ E để nhặt");
                 else if (obj.type == InteractableObject.ObjectType.Door)
@@ -153,8 +161,7 @@ public class CameraZoom : MonoBehaviour
                         GameManager.instance.ShowHint($"Chưa đủ đồ ({GameManager.instance.currentItems}/3)");
                 }
 
-                // 2. Logic Giữ phím E
-                // (Chỉ cho phép giữ nếu là Item hoặc là Cửa đã đủ đồ)
+                // Logic Giữ phím E (Giữ nguyên code của bạn)
                 bool canInteract = (obj.type == InteractableObject.ObjectType.Item) ||
                                    (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.currentItems >= 3);
 
@@ -165,13 +172,12 @@ public class CameraZoom : MonoBehaviour
 
                     if (currentHoldTime >= obj.holdTime)
                     {
-                        obj.PerformAction(); // Nhặt đồ hoặc Thắng game
-                        ResetInteraction();  // Reset sau khi xong
+                        obj.PerformAction();
+                        ResetInteraction();
                     }
                 }
                 else
                 {
-                    // Thả tay ra thì reset loading
                     if (currentHoldTime > 0)
                     {
                         currentHoldTime = 0f;
@@ -199,14 +205,8 @@ public class CameraZoom : MonoBehaviour
         GameManager.instance.StopLoading();
         currentHoldTime = 0f;
 
-        // Tắt Highlight (nếu đang dùng)
-        /*
-        if (currentHighlightObj != null)
-        {
-            currentHighlightObj.ToggleHighlight(false);
-            currentHighlightObj = null;
-        }
-        */
+        // --- RESET HIGHLIGHT (CODE MỚI) ---
+        ResetHighlightEffect();
     }
 
     void ApplyZoomPhysics()
@@ -222,5 +222,19 @@ public class CameraZoom : MonoBehaviour
 
         Vector3 currentDamping = thirdPersonComponent.Damping;
         thirdPersonComponent.Damping = Vector3.Lerp(currentDamping, isZooming ? zoomDamping : defaultDamping, dt);
+    }
+    // Hàm riêng để tắt hiệu ứng sáng
+    void ResetHighlightEffect()
+    {
+        if (currentHighlightObj != null && currentRenderer != null)
+        {
+            // Trả lại material gốc (cái áo cũ)
+            currentRenderer.material = originalMaterial;
+        }
+
+        // Xóa dữ liệu lưu trữ
+        currentHighlightObj = null;
+        currentRenderer = null;
+        originalMaterial = null;
     }
 }
