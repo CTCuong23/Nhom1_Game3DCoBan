@@ -154,6 +154,7 @@ namespace StarterAssets
 
         private void Update()
         {
+            if (_controller.enabled == false) return;
             _hasAnimator = TryGetComponent(out _animator);
 
             JumpAndGravity();
