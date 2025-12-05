@@ -192,7 +192,7 @@ Material:
     - _Cutoff: 0.5
     - _DepthOffsetEnable: 0
     - _DetailNormalMapScale: 1
-    - _Dirt_1: 1
+    - _Dirt_1: 0.94
     - _DoubleSidedEnable: 0
     - _DoubleSidedGIMode: 0
     - _DoubleSidedNormalMode: 2
@@ -248,7 +248,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.5471698, g: 0.5471698, b: 0.5471698, a: 1}
-    - _Dirt: {r: 1, g: 1, b: 1, a: 0}
+    - _Dirt: {r: 0.6226415, g: 0.32715386, b: 0.10220716, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmisColor: {r: 0, g: 0.92097044, b: 1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
