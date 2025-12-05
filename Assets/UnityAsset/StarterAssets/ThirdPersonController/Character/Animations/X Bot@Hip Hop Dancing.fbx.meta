@@ -34,8 +34,8 @@ ModelImporter:
       name: Hip Hop Dancing
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 39
-      lastFrame: 123
+      firstFrame: 0
+      lastFrame: 124
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
