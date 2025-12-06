@@ -6014,13 +6014,57 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 286779897241945404, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1264519992}
+    - target: {fileID: 286779897241945404, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: IncreaseVolume
+      objectReference: {fileID: 0}
     - target: {fileID: 1010976048576592394, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_Name
       value: OptionsPanel
       objectReference: {fileID: 0}
+    - target: {fileID: 1010976048576592394, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1020816738108905294, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1264519992}
+    - target: {fileID: 1020816738108905294, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ToggleMute
+      objectReference: {fileID: 0}
+    - target: {fileID: 2005782880197699811, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1264519991}
+    - target: {fileID: 2005782880197699811, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CloseSettings
+      objectReference: {fileID: 0}
+    - target: {fileID: 2005782880197699811, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PauseMenuController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4424122451540697449, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_Color.a
+      value: 0.78431374
+      objectReference: {fileID: 0}
+    - target: {fileID: 5938860518425176602, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1264519992}
+    - target: {fileID: 5938860518425176602, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: DecreaseVolume
+      objectReference: {fileID: 0}
     - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -6031,12 +6075,28 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1264519991}
+    - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CloseSettings
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PauseMenuController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6053,6 +6113,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1010976048576592394, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
   m_PrefabInstance: {fileID: 803082393}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &803082396 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8838247059679256067, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+  m_PrefabInstance: {fileID: 803082393}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &803082397 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2297079169528777563, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+  m_PrefabInstance: {fileID: 803082393}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &806036248
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7908,7 +7990,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1023076352
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9246,6 +9328,7 @@ GameObject:
   - component: {fileID: 1264519988}
   - component: {fileID: 1264519990}
   - component: {fileID: 1264519991}
+  - component: {fileID: 1264519992}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -9319,6 +9402,23 @@ MonoBehaviour:
   mainButtonsPanel: {fileID: 1596651487}
   settingsPanel: {fileID: 803082395}
   menuSceneName: TraiRoblox2
+--- !u!114 &1264519992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1264519987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdb2b7b7cacbfbe409de11a5e80d65f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  optionsPanel: {fileID: 803082395}
+  volumeText: {fileID: 803082396}
+  speakerImage: {fileID: 803082397}
+  soundOnIcon: {fileID: -1416706497, guid: 69b5ec850b817a54fa3c93ea44d55edc, type: 3}
+  soundOffIcon: {fileID: 1246716080, guid: 69b5ec850b817a54fa3c93ea44d55edc, type: 3}
 --- !u!1 &1264972659
 GameObject:
   m_ObjectHideFlags: 0
