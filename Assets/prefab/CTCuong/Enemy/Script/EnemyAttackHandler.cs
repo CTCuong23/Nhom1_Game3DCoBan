@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine.UI;
 using Script.UI; // Bắt buộc có dòng này để gọi GameController
+using UnityEngine.SceneManagement; // Bắt buộc có để chuyển cảnh
 
 namespace Script.Enemy
 {
@@ -21,6 +22,8 @@ namespace Script.Enemy
         [Header("UI References")]
         [SerializeField] private GameObject youreDeadPanel;
         [SerializeField] private Button restartButton;
+        [SerializeField] private Button BackToMenuButton;
+        [SerializeField] private Button QuitButton;
         [SerializeField] private TMP_Text deathText;
 
         [Header("References")]
@@ -47,6 +50,20 @@ namespace Script.Enemy
             {
                 restartButton.onClick.RemoveAllListeners();
                 restartButton.onClick.AddListener(OnRestartButtonClicked);
+            }
+
+            // 1. Nút Menu
+            if (BackToMenuButton != null)
+            {
+                BackToMenuButton.onClick.RemoveAllListeners(); // Xóa sạch cũ
+                BackToMenuButton.onClick.AddListener(LoadMainMenu); // Gắn hàm LoadMainMenu vào
+            }
+
+            // 2. Nút Quit
+            if (QuitButton != null)
+            {
+                QuitButton.onClick.RemoveAllListeners(); // Xóa sạch cũ
+                QuitButton.onClick.AddListener(QuitGame); // Gắn hàm QuitGame vào
             }
 
             // --- Setup Animator ---
@@ -171,10 +188,22 @@ namespace Script.Enemy
             _hasKilledPlayer = false;
             _isAttacking = false;
             _hasCheckedThisAttack = false;
+        }
 
-            // Bỏ dòng này đi nếu không muốn phụ thuộc StarterAssets
-            // StarterAssets.StarterAssetsInputs.SetGameActive(true); 
-            // Thay vào đó GameController.ClearAllPanels() đã tự xử lý resume rồi
+        public void LoadMainMenu()
+        {
+            SceneManager.LoadScene(0);
+        }
+
+        public void QuitGame()
+        {
+            // Nếu đang test trong Unity Editor thì dừng chơi
+            #if UNITY_EDITOR
+                        UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                            // Nếu đã build ra file game thật (.exe) thì tắt ứng dụng
+                            Application.Quit();
+            #endif
         }
 
         private void TeleportToCheckpoints()
