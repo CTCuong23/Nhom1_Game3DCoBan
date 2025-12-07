@@ -153,8 +153,6 @@ RectTransform:
   - {fileID: 6329404397864734457}
   - {fileID: 956171307037197574}
   - {fileID: 2180026198655143465}
-  - {fileID: 4467401017158532002}
-  - {fileID: 5743950546724362569}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -335,18 +333,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2470045501791778434}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.06510417, y: 0.14285713, z: 0.125}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5943335300737743089}
   - {fileID: 8245895392721939502}
-  m_Father: {fileID: 100490486172224178}
+  m_Father: {fileID: 6329404397864734457}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 9.999999}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2651492265828419538
@@ -361,6 +359,7 @@ GameObject:
   - component: {fileID: 2329193266615889824}
   - component: {fileID: 8373266019065050920}
   - component: {fileID: 286779897241945404}
+  - component: {fileID: 1078486979703771001}
   m_Layer: 5
   m_Name: PlusBtn
   m_TagString: Untagged
@@ -482,6 +481,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1078486979703771001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2651492265828419538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33bd22b1b7601d84c93b0afc66be2b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  source: {fileID: 0}
+  hoverSound: {fileID: 8300000, guid: 15b7517443dbdcb4a8dabdb1570b0b98, type: 3}
+  clickSound: {fileID: 8300000, guid: 9c6d812aa7bcece41a89f8a07d43ec31, type: 3}
 --- !u!1 &3286148533039670267
 GameObject:
   m_ObjectHideFlags: 0
@@ -630,6 +644,7 @@ GameObject:
   - component: {fileID: 1749150568877276571}
   - component: {fileID: 5412737485587557068}
   - component: {fileID: 2005782880197699811}
+  - component: {fileID: 6973155396637859781}
   m_Layer: 5
   m_Name: BackImage
   m_TagString: Untagged
@@ -716,7 +731,7 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
@@ -750,6 +765,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &6973155396637859781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3642890922932407586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33bd22b1b7601d84c93b0afc66be2b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  source: {fileID: 0}
+  hoverSound: {fileID: 8300000, guid: 15b7517443dbdcb4a8dabdb1570b0b98, type: 3}
+  clickSound: {fileID: 8300000, guid: 697249bddf63da24da76f98b9705866f, type: 3}
 --- !u!1 &3759316432763083910
 GameObject:
   m_ObjectHideFlags: 0
@@ -896,7 +926,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5743950546724362569}
   m_Layer: 5
-  m_Name: Volume
+  m_Name: VolumeText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -909,18 +939,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3914311519644157076}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.06510417, y: 0.14285713, z: 0.125}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4761442854327870166}
   - {fileID: 2830444212102478329}
-  m_Father: {fileID: 100490486172224178}
+  m_Father: {fileID: 6329404397864734457}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 9.999999}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &4527287973165522506
@@ -1122,6 +1152,7 @@ GameObject:
   - component: {fileID: 6868042651877294897}
   - component: {fileID: 7654599562503833822}
   - component: {fileID: 5938860518425176602}
+  - component: {fileID: 1057527142581713621}
   m_Layer: 5
   m_Name: MinusBtn
   m_TagString: Untagged
@@ -1209,7 +1240,7 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
@@ -1243,6 +1274,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1057527142581713621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5874352471105577212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33bd22b1b7601d84c93b0afc66be2b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  source: {fileID: 0}
+  hoverSound: {fileID: 8300000, guid: 15b7517443dbdcb4a8dabdb1570b0b98, type: 3}
+  clickSound: {fileID: 8300000, guid: 9c6d812aa7bcece41a89f8a07d43ec31, type: 3}
 --- !u!1 &7315410002954806476
 GameObject:
   m_ObjectHideFlags: 0
@@ -1391,7 +1437,7 @@ GameObject:
   - component: {fileID: 4482797317787185298}
   - component: {fileID: 5843822753034385357}
   m_Layer: 5
-  m_Name: BGM
+  m_Name: BGMText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1677,6 +1723,7 @@ GameObject:
   - component: {fileID: 4342676031496701846}
   - component: {fileID: 2297079169528777563}
   - component: {fileID: 1020816738108905294}
+  - component: {fileID: 5643347435724015002}
   m_Layer: 5
   m_Name: SoundSpeaker
   m_TagString: Untagged
@@ -1797,6 +1844,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &5643347435724015002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8354387631468397000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33bd22b1b7601d84c93b0afc66be2b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  source: {fileID: 0}
+  hoverSound: {fileID: 8300000, guid: 15b7517443dbdcb4a8dabdb1570b0b98, type: 3}
+  clickSound: {fileID: 8300000, guid: 697249bddf63da24da76f98b9705866f, type: 3}
 --- !u!1 &8749611016867554818
 GameObject:
   m_ObjectHideFlags: 0
@@ -1831,6 +1893,8 @@ RectTransform:
   - {fileID: 6996796976830936656}
   - {fileID: 3280183013594589977}
   - {fileID: 7404635667255474570}
+  - {fileID: 5743950546724362569}
+  - {fileID: 4467401017158532002}
   m_Father: {fileID: 100490486172224178}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}

@@ -1283,7 +1283,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   source: {fileID: 1673659908}
   hoverSound: {fileID: 8300000, guid: 15b7517443dbdcb4a8dabdb1570b0b98, type: 3}
-  clickSound: {fileID: 8300000, guid: 907e4b7078aabf44cbcbcbbac2050360, type: 3}
+  clickSound: {fileID: 8300000, guid: 697249bddf63da24da76f98b9705866f, type: 3}
 --- !u!114 &1516278173 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2297079169528777563, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
@@ -1522,7 +1522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   source: {fileID: 1673659908}
   hoverSound: {fileID: 8300000, guid: 15b7517443dbdcb4a8dabdb1570b0b98, type: 3}
-  clickSound: {fileID: 8300000, guid: 907e4b7078aabf44cbcbcbbac2050360, type: 3}
+  clickSound: {fileID: 8300000, guid: 37dd1bceb2526c545a591d5d8d58877e, type: 3}
 --- !u!1 &1635486490
 GameObject:
   m_ObjectHideFlags: 0
@@ -1663,7 +1663,7 @@ GameObject:
   - component: {fileID: 1673659909}
   - component: {fileID: 1673659908}
   m_Layer: 0
-  m_Name: BtnSoundHover
+  m_Name: AudioSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1929,7 +1929,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   source: {fileID: 1673659908}
   hoverSound: {fileID: 8300000, guid: 15b7517443dbdcb4a8dabdb1570b0b98, type: 3}
-  clickSound: {fileID: 8300000, guid: 907e4b7078aabf44cbcbcbbac2050360, type: 3}
+  clickSound: {fileID: 8300000, guid: 37dd1bceb2526c545a591d5d8d58877e, type: 3}
 --- !u!1 &2108564918
 GameObject:
   m_ObjectHideFlags: 0
@@ -2125,14 +2125,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: OptionsPanel
       objectReference: {fileID: 0}
-    - target: {fileID: 1010976048576592394, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1020816738108905294, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2108564922}
+    - target: {fileID: 1057527142581713621, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: source
+      value: 
+      objectReference: {fileID: 1673659908}
+    - target: {fileID: 1078486979703771001, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: source
+      value: 
+      objectReference: {fileID: 1673659908}
     - target: {fileID: 2005782880197699811, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_Colors.m_HighlightedColor.b
       value: 1
@@ -2149,6 +2153,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2108564922}
+    - target: {fileID: 3914311519644157076, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_Name
+      value: VolumeText
+      objectReference: {fileID: 0}
+    - target: {fileID: 5643347435724015002, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: source
+      value: 
+      objectReference: {fileID: 1673659908}
     - target: {fileID: 5938860518425176602, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_Colors.m_HighlightedColor.b
       value: 1
@@ -2165,9 +2177,13 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2108564922}
-    - target: {fileID: 7683380021799469992, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Colors.m_ColorMultiplier
-      value: 1
+    - target: {fileID: 6973155396637859781, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: source
+      value: 
+      objectReference: {fileID: 1673659908}
+    - target: {fileID: 7860768811440631362, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
+      propertyPath: m_Name
+      value: BGMText
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
