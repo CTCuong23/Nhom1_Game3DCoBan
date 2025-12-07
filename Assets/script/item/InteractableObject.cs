@@ -4,12 +4,12 @@ using TMPro;
 
 public class InteractableObject : MonoBehaviour
 {
-    // Thêm Computer vào đây
-    public enum ObjectType { Item, Door, Computer }
+    // Thêm Keypad vào đây
+    public enum ObjectType { Item, Door, Computer, Keypad }
     public ObjectType type;
 
     public enum ItemType { None, Battery, KeyCard, Chip }
-    [Header("Loại vật phẩm (Chỉ chỉnh nếu Type là Item)")]
+    [Header("Loại vật phẩm")]
     public ItemType specificItemType;
 
     [Header("Cài đặt chung")]
@@ -21,10 +21,13 @@ public class InteractableObject : MonoBehaviour
     public PlayableDirector timelineDirector;
 
     [Header("Cài đặt cho Máy Tính")]
-    public GameObject screenCanvas; // Kéo cái Canvas màn hình vào đây
-    public TextMeshProUGUI passwordText; // Kéo Text hiển thị pass vào đây
-    public string passwordContent = "1997"; // Nội dung mật khẩu
-    private bool isComputerOn = false;
+    public GameObject screenCanvas;
+    public TextMeshProUGUI passwordText;
+    public string passwordContent = "1997";
+    public bool isComputerOn = false;
+
+    [Header("Cài đặt cho Keypad")]
+    public KeypadController keypadController; // Kéo script KeypadController vào đây
 
     public string GetHintText()
     {
@@ -36,19 +39,16 @@ public class InteractableObject : MonoBehaviour
             else return $"Chưa đủ đồ ({GameManager.instance.currentItems}/3)";
         }
 
-        // --- LOGIC MÁY TÍNH ---
         if (type == ObjectType.Computer)
         {
-            if (isComputerOn) return ""; // Đã bật rồi thì thôi
+            if (isComputerOn) return "";
+            return GameManager.instance.hasBattery ? "Giữ E để khởi động" : "Cần Pin";
+        }
 
-            if (GameManager.instance.hasBattery)
-            {
-                return "Giữ E để khởi động máy tính";
-            }
-            else
-            {
-                return "Cần Pin để khởi động"; // Báo thiếu đồ
-            }
+        // --- LOGIC KEYPAD MỚI ---
+        if (type == ObjectType.Keypad)
+        {
+            return "Nhấn F để nhập mật khẩu";
         }
 
         return "";
@@ -71,22 +71,29 @@ public class InteractableObject : MonoBehaviour
             if (timelineDirector != null) GameManager.instance.StartEndingSequence(timelineDirector);
             else GameManager.instance.WinGame();
         }
-        // --- XỬ LÝ MÁY TÍNH ---
         else if (type == ObjectType.Computer)
         {
             isComputerOn = true;
-
-            // Bật màn hình lên
-            if (screenCanvas != null)
+            if (screenCanvas != null) screenCanvas.SetActive(true);
+            if (passwordText != null) passwordText.text = "PASSWORD\n" + passwordContent;
+        }
+        // --- KÍCH HOẠT KEYPAD ---
+        else if (type == ObjectType.Keypad)
+        {
+            if (keypadController != null)
             {
-                screenCanvas.SetActive(true);
-            }
-
-            // Gán mật khẩu
-            if (passwordText != null)
-            {
-                passwordText.text = "PASSWORD\n" + passwordContent;
+                keypadController.ActivateKeypad();
             }
         }
+    }
+
+    // Hàm mở cửa do Keypad gọi khi nhập đúng pass
+    public void OpenDoorByKeypad()
+    {
+        if (doorAnimator != null) doorAnimator.SetTrigger("Open");
+        if (doorBlockCollider != null) doorBlockCollider.enabled = false;
+
+        // Phát âm thanh mở cửa ở đây nếu muốn
+        Debug.Log("Cửa đã mở do đúng mật khẩu!");
     }
 }
