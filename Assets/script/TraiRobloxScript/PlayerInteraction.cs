@@ -2,34 +2,40 @@
 
 public class PlayerInteraction : MonoBehaviour
 {
-    // Script này chỉ chuyên xử lý việc đi vào vùng Trigger (Cửa)
-
     private float currentHoldTime = 0f;
-    private InteractableObject currentZoneTarget; // Cửa đang đứng gần
+    private InteractableObject currentZoneTarget;
 
-    // Khi Player đi vào vùng Trigger (InteractionZone)
+    // Khi Player đi vào vùng Trigger
     private void OnTriggerStay(Collider other)
     {
-        // 1. Kiểm tra xem cái mình đụng trúng có phải là Cửa không
         InteractableObject obj = other.GetComponent<InteractableObject>();
 
-        // Chỉ xử lý nếu là DOOR
-        if (obj != null && obj.type == InteractableObject.ObjectType.Door)
+        // Chấp nhận cả Cửa VÀ Máy Tính
+        if (obj != null && (obj.type == InteractableObject.ObjectType.Door || obj.type == InteractableObject.ObjectType.Computer))
         {
             currentZoneTarget = obj;
 
-            // 2. Logic điều kiện thắng
-            if (GameManager.instance.currentItems < 3)
+            // 1. LOGIC CỬA
+            if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.currentItems < 3)
             {
-                // Chưa đủ đồ
                 GameManager.instance.ShowHint(obj.GetHintText());
-                return; // Không cho giữ E
+                return; // Thiếu đồ -> Không cho bấm
             }
 
-            // 3. Đủ đồ -> Hiện gợi ý
+            // 2. LOGIC MÁY TÍNH (MỚI)
+            if (obj.type == InteractableObject.ObjectType.Computer)
+            {
+                // Chưa có pin -> Hiện thông báo thiếu, không cho bấm
+                if (!GameManager.instance.hasBattery)
+                {
+                    GameManager.instance.ShowHint(obj.GetHintText());
+                    return;
+                }
+            }
+
+            // 3. ĐỦ ĐIỀU KIỆN -> HIỆN GỢI Ý & CHO BẤM
             GameManager.instance.ShowHint(obj.GetHintText());
 
-            // 4. Kiểm tra giữ E
             if (Input.GetKey(KeyCode.E))
             {
                 currentHoldTime += Time.deltaTime;
@@ -37,8 +43,8 @@ public class PlayerInteraction : MonoBehaviour
 
                 if (currentHoldTime >= obj.holdTime)
                 {
-                    obj.PerformAction(); // Mở cửa & Cutscene
-                    ResetDoorInteraction(); // Reset ngay để tránh gọi nhiều lần
+                    obj.PerformAction(); // Thực hiện hành động
+                    ResetDoorInteraction(); // Reset sau khi xong
                 }
             }
             else
@@ -53,7 +59,6 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // Khi Player đi ra khỏi vùng Trigger
     private void OnTriggerExit(Collider other)
     {
         InteractableObject obj = other.GetComponent<InteractableObject>();
