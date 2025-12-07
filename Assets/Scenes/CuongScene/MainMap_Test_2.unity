@@ -8180,10 +8180,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
+  specificItemType: 0
   holdTime: 2
   doorAnimator: {fileID: 6468854688524654361}
   doorBlockCollider: {fileID: 6468854688524654362}
   timelineDirector: {fileID: 1585118321}
+  screenCanvas: {fileID: 0}
+  passwordText: {fileID: 0}
+  passwordContent: 1997
+  isComputerOn: 0
+  keypadController: {fileID: 0}
 --- !u!1 &1174087994
 GameObject:
   m_ObjectHideFlags: 0
@@ -8723,13 +8729,21 @@ MonoBehaviour:
   itemCountText: {fileID: 200560442}
   hintText: {fileID: 962633043}
   winText: {fileID: 244769463}
+  slotBattery: {fileID: 0}
+  slotCard: {fileID: 0}
+  slotChip: {fileID: 0}
+  flyingIcon: {fileID: 0}
+  flyDuration: 1.2
   interactionPanel: {fileID: 583146071}
   loadingBar: {fileID: 1496340790}
   timerText: {fileID: 1365404325}
   currentItems: 0
+  hasBattery: 0
   playerMovementScript: {fileID: 1968945574}
   playerAnimator: {fileID: 1968945576}
   isAiming: 0
+  isUsingKeypad: 0
+  playerMesh: {fileID: 0}
 --- !u!4 &1264519989
 Transform:
   m_ObjectHideFlags: 0
@@ -12752,6 +12766,10 @@ PrefabInstance:
       propertyPath: playerCheckpoint
       value: 
       objectReference: {fileID: 236512252}
+    - target: {fileID: 5427144052554186738, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5789109124025534499, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
       propertyPath: m_LocalPosition.x
       value: 118.51833
@@ -14278,6 +14296,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0eb85ae69993f2542a38f9137dd5cfc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactionRange: 3
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1001 &1973305531
 PrefabInstance:
   m_ObjectHideFlags: 0
