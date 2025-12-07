@@ -45,15 +45,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2907834746198687500, guid: 1752c45f6872b9040b36ab622dcca91a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.6217515
+      value: 86.45156
       objectReference: {fileID: 0}
     - target: {fileID: 2907834746198687500, guid: 1752c45f6872b9040b36ab622dcca91a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.09
+      value: 0.94
       objectReference: {fileID: 0}
     - target: {fileID: 2907834746198687500, guid: 1752c45f6872b9040b36ab622dcca91a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.4017483
+      value: 412.57172
       objectReference: {fileID: 0}
     - target: {fileID: 2907834746198687500, guid: 1752c45f6872b9040b36ab622dcca91a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -264,6 +264,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patrolPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
