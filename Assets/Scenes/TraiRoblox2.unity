@@ -2138,41 +2138,13 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1673659908}
     - target: {fileID: 2005782880197699811, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Colors.m_HighlightedColor.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2005782880197699811, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Colors.m_HighlightedColor.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2005782880197699811, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Colors.m_HighlightedColor.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2005782880197699811, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2108564922}
-    - target: {fileID: 3914311519644157076, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Name
-      value: VolumeText
-      objectReference: {fileID: 0}
     - target: {fileID: 5643347435724015002, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: source
       value: 
       objectReference: {fileID: 1673659908}
-    - target: {fileID: 5938860518425176602, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Colors.m_HighlightedColor.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5938860518425176602, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Colors.m_HighlightedColor.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5938860518425176602, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Colors.m_HighlightedColor.r
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5938860518425176602, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -2181,10 +2153,6 @@ PrefabInstance:
       propertyPath: source
       value: 
       objectReference: {fileID: 1673659908}
-    - target: {fileID: 7860768811440631362, guid: 427dae1b10ec84348a9aaa0d8cf361c1, type: 3}
-      propertyPath: m_Name
-      value: BGMText
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
