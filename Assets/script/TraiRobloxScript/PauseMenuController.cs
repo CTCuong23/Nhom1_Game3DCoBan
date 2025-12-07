@@ -5,74 +5,85 @@ using UnityEngine.UI;
 public class PauseMenuController : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject pauseMenuUI;      // Panel chứa toàn bộ menu pause
-    public GameObject mainButtonsPanel; // Panel chứa các nút: Resume, Settings, Quit (Tạo thêm cái này để gom nút lại cho dễ ẩn)
-    public GameObject settingsPanel;    // Kéo cái Prefab UI từ Menu vào đây
+    public GameObject pauseMenuUI;      // Panel to (chứa tất cả)
+    public GameObject mainButtonsPanel; // Panel chứa các nút Resume, Settings, Quit
+    public GameObject settingsPanel;    // Panel Settings (Options)
 
     [Header("Settings")]
     public string menuSceneName = "MainMenu";
 
     public static bool GameIsPaused = false;
 
+    void Start()
+    {
+        // Đảm bảo khi game bắt đầu thì mọi menu đều tắt
+        if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+        GameIsPaused = false;
+    }
+
     void Update()
     {
+        // Bắt sự kiện nhấn phím ESC
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameIsPaused)
+            // TRƯỜNG HỢP 1: Game đang chạy bình thường (Chưa Pause)
+            if (!GameIsPaused)
             {
-                // Nếu đang mở bảng setting thì ấn Esc sẽ quay lại menu pause chính
-                if (settingsPanel.activeSelf)
+                Pause(); // -> Gọi hàm Pause để hiện menu
+            }
+            // TRƯỜNG HỢP 2: Game ĐANG PAUSE
+            else
+            {
+                // Nếu đang mở bảng Settings thì cho phép ấn ESC để quay lại menu nút bấm chính
+                if (settingsPanel != null && settingsPanel.activeSelf)
                 {
                     CloseSettings();
                 }
-                else
-                {
-                    Resume();
-                }
-            }
-            else
-            {
-                Pause();
+                // Nếu đang ở menu chính (có nút Resume) thì ấn ESC KHÔNG LÀM GÌ CẢ (đúng ý bạn)
             }
         }
     }
 
     public void Resume()
     {
-        pauseMenuUI.SetActive(false);
-        settingsPanel.SetActive(false); // Đảm bảo tắt setting
+        if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+
         Time.timeScale = 1f;
         GameIsPaused = false;
 
+        // Khóa chuột và ẩn chuột khi quay lại game
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     void Pause()
     {
-        pauseMenuUI.SetActive(true);
-        mainButtonsPanel.SetActive(true); // Hiện lại các nút chính
-        settingsPanel.SetActive(false);   // Ẩn bảng setting đi
+        if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
+
+        // QUAN TRỌNG: Khi mới Pause, BẮT BUỘC hiện nút bấm chính và ẨN settings đi
+        if (mainButtonsPanel != null) mainButtonsPanel.SetActive(true);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
 
         Time.timeScale = 0f;
         GameIsPaused = true;
 
+        // Mở khóa chuột để bấm menu
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
-    // Hàm này gắn vào nút "Cài đặt" (hoặc nút Menu mà bạn muốn)
     public void OpenSettings()
     {
-        mainButtonsPanel.SetActive(false); // Ẩn các nút Resume/Quit đi
-        settingsPanel.SetActive(true);     // Hiện bảng Setting (Prefab cũ) lên
+        if (mainButtonsPanel != null) mainButtonsPanel.SetActive(false); // Ẩn nút chính
+        if (settingsPanel != null) settingsPanel.SetActive(true);     // Hiện Settings
     }
 
-    // Hàm này gắn vào nút "Back" hoặc "X" ở trong bảng SettingsPanel
     public void CloseSettings()
     {
-        settingsPanel.SetActive(false);    // Tắt bảng Setting
-        mainButtonsPanel.SetActive(true);  // Hiện lại menu chính
+        if (settingsPanel != null) settingsPanel.SetActive(false);    // Tắt Settings
+        if (mainButtonsPanel != null) mainButtonsPanel.SetActive(true);  // Hiện lại nút chính
     }
 
     public void LoadMenu()
