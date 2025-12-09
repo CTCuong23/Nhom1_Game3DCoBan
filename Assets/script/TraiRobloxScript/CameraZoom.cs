@@ -70,8 +70,8 @@ public class CameraZoom : MonoBehaviour
     {
         if (vCam == null || thirdPersonComponent == null) return;
 
-        // 1. INPUT BẬT/TẮT ZOOM (Phím số 1)
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        // 1. INPUT BẬT/TẮT ZOOM (Phím Q)
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             isZooming = !isZooming;
             GameManager.instance.isAiming = !GameManager.instance.isAiming;
