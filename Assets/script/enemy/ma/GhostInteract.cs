@@ -23,6 +23,9 @@ public class GhostInteract : MonoBehaviour
 
     void Update()
     {
+        // 1. Nếu game đang Pause (TimeScale = 0) -> KHÔNG LÀM GÌ CẢ (Fix lỗi nhấn F khi chết)
+        if (Time.timeScale == 0) return;
+
         if (isPlayerNearby)
         {
             if (!gameManager.gameActive)
@@ -31,8 +34,7 @@ public class GhostInteract : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.F))
                 {
-                    // --- THÊM DÒNG CHECK NÀY ---
-                    // Nếu thời gian hiện tại chưa qua khỏi 0.5 giây kể từ lúc đóng -> Bỏ qua
+                    // Check thời gian đóng cũ (để tránh spam)
                     if (Time.time < gameManager.lastCloseTime + 0.5f) return;
 
                     gameManager.StartGame();
@@ -41,6 +43,7 @@ public class GhostInteract : MonoBehaviour
             }
             else
             {
+                // Khi đang chơi thì tắt gợi ý
                 GameManager.instance.HideHint();
             }
         }

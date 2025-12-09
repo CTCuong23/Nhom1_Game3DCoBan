@@ -10,62 +10,69 @@ public class TicTacToeManager : MonoBehaviour
     [Header("Setup UI")]
     public Button[] buttons;
     public TextMeshProUGUI[] buttonTexts;
-    public GameObject gameUI; 
+    public GameObject gameUI;
 
     [Header("Setup Cinematic")]
-    public CinemachineVirtualCamera caroCamera;
-    public GameObject playerModel; 
+    public CinemachineVirtualCamera caroCamera; // Cam bàn cờ
+    public CinemachineVirtualCamera faceCamera; // <--- KÉO CAM ZOOM MẶT VÀO ĐÂY
+    public GameObject playerModel;
 
     [Header("Setup Con Ma")]
-    public Animator ghostAnimator; 
-    public AudioSource ghostAudioSource; 
-    public AudioClip laughSound;   
-    public AudioClip jumpscareSound; 
+    public Animator ghostAnimator;
+    public AudioSource ghostAudioSource;
+    public AudioClip laughSound;
+    public AudioClip jumpscareSound;
 
     [Header("Game Over & Win")]
     public GameObject keyPrefab;
     public Transform dropPoint;
-    public GameObject deathPanel; 
-    public TextMeshProUGUI deathText; 
+    public GameObject deathPanel;
+    public TextMeshProUGUI deathText;
 
-    // Biến trạng thái
+    // Biến nội bộ
     private string[] board = new string[9];
     private bool isPlayerTurn = true;
-    public bool gameActive = false; // Public để GhostInteract đọc được
+    public bool gameActive = false;
     private int movesCount = 0;
     [HideInInspector] public float lastCloseTime = 0f;
     private PlayerStats playerStats;
 
     void Start()
     {
-        // Setup nút bấm
+        // Tự động tìm Text
+        if (buttonTexts == null || buttonTexts.Length != buttons.Length)
+        {
+            buttonTexts = new TextMeshProUGUI[buttons.Length];
+            for (int i = 0; i < buttons.Length; i++)
+                if (buttons[i] != null) buttonTexts[i] = buttons[i].GetComponentInChildren<TextMeshProUGUI>();
+        }
+
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;
             buttons[i].onClick.AddListener(() => OnPlayerClick(index));
-            buttonTexts[i].text = "";
+            if (buttonTexts[i] != null) buttonTexts[i].text = "";
         }
-        
+
+        // Reset Priority Camera
         if (caroCamera != null) caroCamera.Priority = 0;
-        // Đảm bảo bảng chết tắt lúc đầu
+        if (faceCamera != null) faceCamera.Priority = 0; // Đảm bảo cam mặt tắt lúc đầu
+
         if (deathPanel != null) deathPanel.SetActive(false);
-        if (playerModel != null) 
-             playerStats = playerModel.GetComponent<PlayerStats>();
-        else // Fallback nếu playerModel là object con, tìm ở cha
-             playerStats = FindObjectOfType<PlayerStats>();
+
+        // Tìm script máu
+        if (playerModel != null) playerStats = playerModel.GetComponentInParent<PlayerStats>();
+        if (playerStats == null) playerStats = FindObjectOfType<PlayerStats>();
     }
 
     void Update()
     {
-        // --- CHỨC NĂNG MỚI: NHẤN F ĐỂ THOÁT ---
-        // Chỉ hoạt động khi game đang bật VÀ không bị Pause
+        // F để thoát (Chỉ khi game đang chạy và không bị Pause)
         if (gameActive && Input.GetKeyDown(KeyCode.F) && Time.timeScale != 0)
         {
             CloseGame();
         }
-        
-        // --- FIX LỖI CON TRỎ CHUỘT ---
-        // Đảm bảo khi chơi cờ thì luôn hiện chuột (tránh bị script khác khóa lại)
+
         if (gameActive && Cursor.lockState != CursorLockMode.None)
         {
             Cursor.lockState = CursorLockMode.None;
@@ -77,19 +84,22 @@ public class TicTacToeManager : MonoBehaviour
     {
         if (gameActive) return;
         gameActive = true;
-        
-        caroCamera.Priority = 20;
-        if (playerModel != null) playerModel.SetActive(false);
-        if (gameUI != null) gameUI.SetActive(false);
 
-        // Mở chuột ngay lập tức
+        caroCamera.Priority = 20; // Bật cam bàn cờ
+        if (faceCamera != null) faceCamera.Priority = 0; // Tắt cam mặt
+
+        if (playerModel != null)
+        {
+            Renderer[] renderers = playerModel.GetComponentsInChildren<Renderer>();
+            foreach (var r in renderers) r.enabled = false;
+        }
+
+        if (gameUI != null) gameUI.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
         ResetBoard();
     }
 
-    // ... (Giữ nguyên logic đánh cờ OnPlayerClick, MakeMove, CheckWin, CheckLine...)
     void OnPlayerClick(int index)
     {
         if (!isPlayerTurn || !gameActive || board[index] != "" || Time.timeScale == 0) return;
@@ -101,36 +111,6 @@ public class TicTacToeManager : MonoBehaviour
         else { isPlayerTurn = false; StartCoroutine(GhostMove()); }
     }
 
-    // Logic cũ của ông, tui rút gọn cho dễ nhìn
-    void MakeMove(int index, string mark)
-    {
-        board[index] = mark;
-        buttonTexts[index].text = mark;
-        buttonTexts[index].color = (mark == "X") ? Color.green : Color.red;
-        movesCount++;
-    }
-
-    bool CheckWin(string mark)
-    {
-        if (CheckLine(0,1,2,mark) || CheckLine(3,4,5,mark) || CheckLine(6,7,8,mark) ||
-            CheckLine(0,3,6,mark) || CheckLine(1,4,7,mark) || CheckLine(2,5,8,mark) ||
-            CheckLine(0,4,8,mark) || CheckLine(2,4,6,mark)) return true;
-        return false;
-    }
-
-    bool CheckLine(int a, int b, int c, string mark) { return board[a] == mark && board[b] == mark && board[c] == mark; }
-
-    IEnumerator ResetWithDelay() { yield return new WaitForSeconds(1.5f); ResetBoard(); }
-
-    void ResetBoard()
-    {
-        for (int i = 0; i < 9; i++) { board[i] = ""; buttonTexts[i].text = ""; }
-        isPlayerTurn = true;
-        movesCount = 0;
-    }
-
-    // ... (Hết phần logic cũ)
-
     IEnumerator GhostMove()
     {
         yield return new WaitForSeconds(1f);
@@ -138,12 +118,11 @@ public class TicTacToeManager : MonoBehaviour
         List<int> emptySlots = new List<int>();
         for (int i = 0; i < 9; i++) if (board[i] == "") emptySlots.Add(i);
 
-        // Chỉ đánh khi game vẫn đang Active (đề phòng người chơi bấm F thoát lúc ma đang nghĩ)
         if (emptySlots.Count > 0 && gameActive)
         {
             int randomIndex = emptySlots[Random.Range(0, emptySlots.Count)];
             MakeMove(randomIndex, "O");
-            
+
             if (ghostAudioSource != null && laughSound != null) ghostAudioSource.PlayOneShot(laughSound);
 
             if (CheckWin("O"))
@@ -155,96 +134,98 @@ public class TicTacToeManager : MonoBehaviour
         }
     }
 
+    // --- LOGIC JUMPSCARE & LAST HIT MỚI ---
     IEnumerator TriggerJumpscare()
     {
-        gameActive = false;
-        Debug.Log("💀 MA THẮNG! Jumpscare...");
+        // 1. Kiểm tra xem cú này có chết không?
+        bool isLastHit = false;
+        if (playerStats != null)
+        {
+            // Nếu máu hiện tại <= 50 thì trừ 50 nữa là đi đời
+            if (playerStats.currentHealth <= 50f) isLastHit = true;
+        }
 
+        // 2. Nếu là Last Hit -> Zoom vào mặt
+        if (isLastHit && faceCamera != null)
+        {
+            Debug.Log("LAST HIT! ZOOM MẶT!");
+            faceCamera.Priority = 30; // Cao hơn cả CaroCamera (20)
+            caroCamera.Priority = 0;
+        }
+
+        Debug.Log("MA THẮNG! Animation Jumpscare...");
+
+        // 3. Chơi Animation & Âm thanh
         if (ghostAnimator != null) ghostAnimator.SetTrigger("Kill");
+
         if (ghostAudioSource != null && jumpscareSound != null)
         {
             ghostAudioSource.Stop();
             ghostAudioSource.PlayOneShot(jumpscareSound);
         }
 
-        // Chờ animation hù dọa xong
+        // 4. Đợi diễn xong (2 giây)
         yield return new WaitForSecondsRealtime(2f);
 
-        // --- LOGIC MỚI: TRỪ MÁU ---
+        // 5. Xử lý Hậu quả
         if (playerStats != null)
         {
-            // Trừ 50 máu (50%)
+            // Trừ máu (Nếu last hit -> Máu về 0 -> PlayerStats tự gọi Die -> Tự hiện DeathPanel)
             playerStats.TakeDamage(50f);
 
-            // Kiểm tra xem còn sống không?
-            // (Truy cập biến currentHealth hơi khó vì nó private, nên ta check fillAmount hoặc check trạng thái game)
-            // Cách đơn giản: Nếu GameController chưa Pause nghĩa là chưa chết
-            if (!Script.UI.GameController.IsGamePaused())
+            // Nếu KHÔNG PHẢI last hit (vẫn sống) -> Thoát game cờ để chạy
+            if (!isLastHit)
             {
-                // CÒN SỐNG -> Thoát game cờ để chạy trốn
-                Debug.Log("Vẫn còn sống! Chạy ngay đi!");
+                Debug.Log("Vẫn sống! Chạy đi!");
                 CloseGame();
             }
             else
             {
-                // ĐÃ CHẾT (PlayerStats tự gọi PauseGame rồi)
-                // Ta chỉ cần đảm bảo UI DeathPanel hiện đúng (PlayerStats lo vụ này hoặc code cũ lo)
-                // Vì PlayerStats đã gọi PauseGame(deathPanel), ta không cần gọi ShowDeathPanel ở đây nữa
+                // NẾU CHẾT RỒI:
+                // Không gọi CloseGame() nữa (để giữ camera ở mặt con ma)
+                // PlayerStats.Die() sẽ lo việc hiện bảng và Pause game
+                Debug.Log("Đã chết! Game Over!");
             }
         }
         else
         {
-            // Nếu không tìm thấy script máu thì cứ giết luôn cho chắc
+            // Fallback nếu lỗi script
             ShowDeathPanel();
         }
     }
 
-    void ShowDeathPanel()
-    {
-        // --- FIX LỖI UI BỊ ẨN ---
-        // Bật lại GameUI tổng trước (đề phòng DeathPanel nằm trong đó)
-        if (gameUI != null) gameUI.SetActive(true);
+    // ... (Giữ nguyên các hàm ShowDeathPanel, MakeMove, CheckWin, CheckLine, ResetWithDelay, ResetBoard, EndGame...) 
+    // COPY LẠI HÀM CŨ NẾU CẦN, HOẶC GIỮ NGUYÊN FILE CŨ CHỈ THAY ĐOẠN TRÊN
 
-        // Hiện chuột để bấm nút
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+    // ... (Phần dưới giữ nguyên như cũ) ...
+    void ShowDeathPanel() { /* Code cũ */ if (gameUI != null) gameUI.SetActive(true); Cursor.lockState = CursorLockMode.None; Cursor.visible = true; if (deathPanel != null) { if (gameUI != null && deathPanel.transform.parent == gameUI.transform) deathPanel.transform.SetParent(gameUI.transform.parent); deathPanel.SetActive(true); deathPanel.transform.SetAsLastSibling(); Script.UI.GameController.PauseGame(deathPanel); } if (deathText != null) deathText.text = "BẠN ĐÃ THUA TRÍ TUỆ CỦA MA!"; }
+    void MakeMove(int index, string mark) { board[index] = mark; buttonTexts[index].text = mark; buttonTexts[index].color = (mark == "X") ? Color.green : Color.red; movesCount++; }
+    bool CheckWin(string mark) { if (CheckLine(0, 1, 2, mark) || CheckLine(3, 4, 5, mark) || CheckLine(6, 7, 8, mark) || CheckLine(0, 3, 6, mark) || CheckLine(1, 4, 7, mark) || CheckLine(2, 5, 8, mark) || CheckLine(0, 4, 8, mark) || CheckLine(2, 4, 6, mark)) return true; return false; }
+    bool CheckLine(int a, int b, int c, string mark) { return board[a] == mark && board[b] == mark && board[c] == mark; }
+    IEnumerator ResetWithDelay() { yield return new WaitForSeconds(1.5f); ResetBoard(); }
+    void ResetBoard() { for (int i = 0; i < 9; i++) { board[i] = ""; buttonTexts[i].text = ""; } isPlayerTurn = true; movesCount = 0; }
+    void EndGame(bool playerWin) { if (playerWin) { if (keyPrefab != null) Instantiate(keyPrefab, dropPoint.position, Quaternion.identity); CloseGame(); } }
 
-        if (deathPanel != null)
-        {
-            deathPanel.SetActive(true);
-            // Đưa panel lên trên cùng để không bị cái gì che mất
-            deathPanel.transform.SetAsLastSibling();
-
-            // Gọi Pause Game
-            Script.UI.GameController.PauseGame(deathPanel);
-        }
-        else
-        {
-            Debug.LogError("LỖI: Chưa kéo DeathPanel vào script TicTacToeManager kìa bro!");
-        }
-
-        if (deathText != null) deathText.text = "BẠN ĐÃ THUA TRÍ TUỆ CỦA MA!";
-    }
-
-    void EndGame(bool playerWin)
-    {
-        if (playerWin)
-        {
-            if (keyPrefab != null) Instantiate(keyPrefab, dropPoint.position, Quaternion.identity);
-            CloseGame(); // Thắng thì tự thoát
-        }
-    }
-
-    // Hàm thoát game chung (dùng cho cả nút F và khi thắng)
     void CloseGame()
     {
-        // --- THÊM DÒNG NÀY ---
-        lastCloseTime = Time.time; // Ghi lại giờ đóng cửa
-
+        lastCloseTime = Time.time;
         gameActive = false;
-        caroCamera.Priority = 0;
 
-        if (playerModel != null) playerModel.SetActive(true);
+        caroCamera.Priority = 0;
+        if (faceCamera != null) faceCamera.Priority = 0; // Tắt cam mặt luôn
+
+        if (ghostAnimator != null)
+        {
+            ghostAnimator.ResetTrigger("Kill");
+            ghostAnimator.Play("Idle");
+        }
+
+        if (playerModel != null)
+        {
+            Renderer[] renderers = playerModel.GetComponentsInChildren<Renderer>();
+            foreach (var r in renderers) r.enabled = true;
+        }
+
         if (gameUI != null) gameUI.SetActive(true);
 
         Cursor.lockState = CursorLockMode.Locked;
