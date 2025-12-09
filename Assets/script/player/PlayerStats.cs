@@ -1,25 +1,25 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using StarterAssets; // Để gọi script input của nhân vật
+using StarterAssets;
 using Script.UI; // Để gọi GameController
 
 public class PlayerStats : MonoBehaviour
 {
     [Header("UI References")]
-    public Image healthFill;   // Kéo ảnh Health_Fill vào đây
-    public Image staminaFill;  // Kéo ảnh Stamina_Fill vào đây
+    public Image healthFill;
+    public Image staminaFill;
+    public GameObject deathPanel; // <--- THÊM BIẾN NÀY ĐỂ KÉO THẢ
 
     [Header("Health Settings")]
     public float maxHealth = 100f;
-    [SerializeField] private float currentHealth;
+    public float currentHealth;
 
     [Header("Stamina Settings")]
     public float maxStamina = 100f;
-    public float staminaDrainRate = 20f; // Tốc độ tụt khi chạy
-    public float staminaRegenRate = 10f; // Tốc độ hồi phục
+    public float staminaDrainRate = 20f;
+    public float staminaRegenRate = 10f;
     [SerializeField] private float currentStamina;
 
-    // References
     private StarterAssetsInputs _input;
     private ThirdPersonController _controller;
 
@@ -40,12 +40,12 @@ public class PlayerStats : MonoBehaviour
         UpdateUI();
     }
 
-    // --- XỬ LÝ NĂNG LƯỢNG (STAMINA) ---
     void HandleStamina()
     {
         if (_input == null) return;
 
-        // Nếu đang giữ Shift (sprint) VÀ đang di chuyển
+        // Logic hồi năng lượng vẫn chạy bình thường kể cả khi đang chơi cờ
+        // (Vì nhân vật chỉ bị tàng hình chứ không bị tắt)
         if (_input.sprint && _input.move != Vector2.zero)
         {
             if (currentStamina > 0)
@@ -54,14 +54,12 @@ public class PlayerStats : MonoBehaviour
             }
             else
             {
-                // Hết hơi -> Ép tắt chạy nhanh
                 currentStamina = 0;
                 _input.sprint = false;
             }
         }
         else
         {
-            // Hồi phục khi không chạy
             if (currentStamina < maxStamina)
             {
                 currentStamina += staminaRegenRate * Time.deltaTime;
@@ -69,10 +67,9 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    // --- XỬ LÝ MÁU (HEALTH) ---
     public void TakeDamage(float amount)
     {
-        if (currentHealth <= 0) return; // Đã chết rồi thì thôi
+        if (currentHealth <= 0) return;
 
         currentHealth -= amount;
         Debug.Log($"Bị đánh! Máu còn: {currentHealth}");
@@ -90,16 +87,23 @@ public class PlayerStats : MonoBehaviour
         currentHealth = 0;
         Debug.Log("Player Dead!");
 
-        // Gọi bảng chết từ GameController (sử dụng lại logic cũ của bro)
-        // Tìm UI DeathPanel trong scene (hoặc gán cứng nếu muốn)
-        GameObject deathPanel = GameObject.Find("YoureDeadPanel");
         if (deathPanel != null)
         {
-            GameController.PauseGame(deathPanel);
+            // Bật UI cha (nếu có)
+            if (deathPanel.transform.parent != null)
+                deathPanel.transform.parent.gameObject.SetActive(true);
+
+            // Gọi Pause Game
+            Script.UI.GameController.PauseGame(deathPanel);
+
+            // --- FIX LỖI MẤT CHUỘT ---
+            // Ép mở khóa chuột lần nữa cho chắc chắn
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
         else
         {
-            Debug.LogError("Không tìm thấy YoureDeadPanel để hiện!");
+            Debug.LogError("QUÊN KÉO CÁI DEATH PANEL VÀO SCRIPT PLAYER STATS RỒI ÔNG ƠI!");
         }
     }
 
@@ -109,7 +113,6 @@ public class PlayerStats : MonoBehaviour
         if (staminaFill != null) staminaFill.fillAmount = currentStamina / maxStamina;
     }
 
-    // Hàm hồi máu (dùng cho vật phẩm nếu cần)
     public void Heal(float amount)
     {
         currentHealth += amount;
