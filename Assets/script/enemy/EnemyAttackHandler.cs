@@ -171,9 +171,31 @@ namespace Script.Enemy
 
         private void KillPlayer()
         {
-            _hasKilledPlayer = true;
-            GameController.PauseGame(youreDeadPanel);
-            if (deathText != null) deathText.text = "YOU'RE DEAD!";
+            // Tìm script máu của người chơi
+            PlayerStats stats = player.GetComponent<PlayerStats>();
+
+            if (stats != null)
+            {
+                // Trừ 50 máu
+                stats.TakeDamage(50f);
+
+                // Đẩy người chơi ra xa chút hoặc reset attack để không bị trừ máu liên tục mỗi khung hình
+                _hasKilledPlayer = true; // Tạm dùng biến này để chặn đánh tiếp (hoặc bro viết logic cooldown)
+
+                // Logic Reset để quái đánh tiếp được sau 1-2 giây (Tùy chọn)
+                Invoke("ResetAttackState", 2f);
+            }
+            else
+            {
+                // Không có script máu thì giết luôn như cũ
+                _hasKilledPlayer = true;
+                Script.UI.GameController.PauseGame(youreDeadPanel);
+                if (deathText != null) deathText.text = "YOU'RE DEAD!";
+            }
+        }
+        void ResetAttackState()
+        {
+            _hasKilledPlayer = false; // Cho phép đánh lại
         }
 
         private void OnRestartButtonClicked()
