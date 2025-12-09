@@ -32,16 +32,6 @@ public class PauseMenuController : MonoBehaviour
             {
                 Pause(); // -> Gọi hàm Pause để hiện menu
             }
-            // TRƯỜNG HỢP 2: Game ĐANG PAUSE
-            else
-            {
-                // Nếu đang mở bảng Settings thì cho phép ấn ESC để quay lại menu nút bấm chính
-                if (settingsPanel != null && settingsPanel.activeSelf)
-                {
-                    CloseSettings();
-                }
-                // Nếu đang ở menu chính (có nút Resume) thì ấn ESC KHÔNG LÀM GÌ CẢ (đúng ý bạn)
-            }
         }
     }
 
