@@ -57,36 +57,4 @@ public class MovingPlatform3D : MonoBehaviour
 
         isWaiting = false;
     }
-
-    // --- PHẦN GIỮ CHÂN NHÂN VẬT (CHUYỂN TỪ 2D SANG 3D) ---
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        // Kiểm tra va chạm với Player
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            // Kiểm tra xem nhân vật có đứng TRÊN box không (để tránh dính khi chạm cạnh bên)
-            // (Trong 3D, normal hướng lên trên là (0, 1, 0))
-            foreach (ContactPoint contact in collision.contacts)
-            {
-                if (contact.normal.y < -0.5f) // Normal hướng từ Player xuống Box
-                {
-                    collision.transform.SetParent(transform);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            // Chỉ bỏ cha nếu cha hiện tại chính là cái box này
-            if (collision.transform.parent == transform)
-            {
-                collision.transform.SetParent(null);
-            }
-        }
-    }
 }
