@@ -33,22 +33,6 @@ public class MainMenuController : MonoBehaviour
         UpdateVolumeUI();
     }
 
-    void Update()
-    {
-        // --- SỬA LỖI TẠI ĐÂY ---
-        // Nếu đang ở trong Game Play thì KHÔNG ĐƯỢC bắt phím ESC ở script này
-        // (Để nhường cho PauseMenuController xử lý)
-        if (isGameplayScene) return;
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (optionsPanel != null && !optionsPanel.activeSelf)
-            {
-                OpenOptions();
-            }
-        }
-    }
-
     public void PlayGame()
     {
         SceneManager.LoadScene("MainMap");
