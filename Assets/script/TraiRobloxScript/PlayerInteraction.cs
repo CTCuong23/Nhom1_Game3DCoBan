@@ -38,51 +38,46 @@ public class PlayerInteraction : MonoBehaviour
 
         InteractableObject obj = currentTriggerObj;
 
-        // 1. LOGIC KEYPAD (Phím F)
-        if (obj.type == InteractableObject.ObjectType.Keypad)
+        // --- ƯU TIÊN 1: PHÍM F (Keypad & Tủ) ---
+        if (obj.type == InteractableObject.ObjectType.Keypad || obj.type == InteractableObject.ObjectType.Locker)
         {
             GameManager.instance.ShowHint(obj.GetHintText());
+
             if (Input.GetKeyDown(KeyCode.F))
             {
                 obj.PerformAction();
             }
-            return;
+            return; // Xong việc, không chạy phần dưới
         }
 
-        // 2. LOGIC CỬA & MÁY TÍNH (Phím E)
+        // --- ƯU TIÊN 2: PHÍM E (Nhặt đồ, Cửa, Máy tính) ---
 
-        // Kiểm tra Máy tính đã bật chưa
-        if (obj.type == InteractableObject.ObjectType.Computer && obj.isComputerOn)
-        {
-            GameManager.instance.HideHint();
-            return;
-        }
-
-        // --- CẬP NHẬT LOGIC MỚI TẠI ĐÂY ---
-
-        // Kiểm tra Cửa: Dùng biến collectedKeyCards mới (10 thẻ)
-        if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.collectedKeyCards < 10)
-        {
-            GameManager.instance.ShowHint(obj.GetHintText());
-            return; // Chưa đủ thẻ thì không cho giữ E
-        }
-
-        // Kiểm tra Máy tính: Check xem tay có đang cầm Pin không?
+        // Kiểm tra điều kiện Máy tính
         if (obj.type == InteractableObject.ObjectType.Computer)
         {
-            // Nếu tay KHÔNG cầm Pin -> Chỉ hiện gợi ý, không cho bấm
+            if (obj.isComputerOn)
+            {
+                GameManager.instance.HideHint();
+                return;
+            }
             if (!GameManager.instance.IsHoldingItem(InteractableObject.ItemType.Battery))
             {
                 GameManager.instance.ShowHint(obj.GetHintText());
                 return;
             }
         }
-        // -----------------------------------
 
-        // Hiện gợi ý (Ví dụ: "Giữ E để mở")
+        // Kiểm tra điều kiện Cửa
+        if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.collectedKeyCards < 10)
+        {
+            GameManager.instance.ShowHint(obj.GetHintText());
+            return;
+        }
+
+        // Hiện gợi ý chung
         GameManager.instance.ShowHint(obj.GetHintText());
 
-        // Xử lý giữ phím E
+        // Xử lý Giữ Phím E (ĐÃ KHÔI PHỤC)
         if (Input.GetKey(KeyCode.E))
         {
             currentHoldTime += Time.deltaTime;

@@ -4,26 +4,20 @@ using TMPro;
 
 public class InteractableObject : MonoBehaviour
 {
-    public enum ObjectType { Item, Door, Computer, Keypad }
+    public enum ObjectType { Item, Door, Computer, Keypad, Locker }
     public ObjectType type;
 
-    // Phân loại Item kỹ hơn
-    public enum ItemType
-    {
-        None,
-        Battery,    // Dùng được -> Vào Hotbar
-        HealthPotion, // Dùng được -> Vào Hotbar
-        KeyCard,    // Cốt truyện -> Bay lên góc
-        Chip        // Cốt truyện -> Bay lên góc
-    }
+    public enum ItemType { None, Battery, HealthPotion, KeyCard, Chip }
+
+    [Header("--- QUEST MARKER ---")]
+    public GameObject questMarker;
+
+    [Header("Cài đặt Tủ Trốn")]
+    public HidingLocker lockerScript;
 
     [Header("Loại vật phẩm")]
     public ItemType specificItemType;
-
-    [Header("Hình ảnh (Cho Hotbar)")]
-    public Sprite itemIcon; // <--- KÉO ẢNH ICON CỤC PIN VÀO ĐÂY
-
-    [Header("Cài đặt chung")]
+    public Sprite itemIcon;
     public float holdTime = 2f;
 
     [Header("Cài đặt cho Cửa")]
@@ -40,13 +34,31 @@ public class InteractableObject : MonoBehaviour
     [Header("Cài đặt cho Keypad")]
     public KeypadController keypadController;
 
+    void Start()
+    {
+        // Tự động tìm Marker nếu chưa kéo
+        if (questMarker == null)
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.name.Contains("Marker") || child.name.Contains("marker"))
+                {
+                    questMarker = child.gameObject;
+                    break;
+                }
+            }
+        }
+        if (questMarker != null) questMarker.SetActive(true);
+    }
+
     public string GetHintText()
     {
         if (type == ObjectType.Item) return "Giữ E để nhặt " + specificItemType.ToString();
 
+        if (type == ObjectType.Locker) return "Nhấn F để trốn";
+
         if (type == ObjectType.Door)
         {
-            // Yêu cầu 10 thẻ
             if (GameManager.instance.collectedKeyCards >= 10) return "Đã đủ 10 thẻ\nGiữ E để thoát";
             else return $"Cần tìm thẻ ({GameManager.instance.collectedKeyCards}/10)";
         }
@@ -54,12 +66,8 @@ public class InteractableObject : MonoBehaviour
         if (type == ObjectType.Computer)
         {
             if (isComputerOn) return "";
-
-            // Logic mới: Kiểm tra xem tay có đang cầm Pin không?
-            if (GameManager.instance.IsHoldingItem(ItemType.Battery))
-                return "Giữ E để lắp Pin";
-            else
-                return "Cần trang bị Pin (Phím 1-5)";
+            if (GameManager.instance.IsHoldingItem(ItemType.Battery)) return "Giữ E để lắp Pin";
+            else return "Cần trang bị Pin (Phím 1-5)";
         }
 
         if (type == ObjectType.Keypad) return "Nhấn F để nhập mật khẩu";
@@ -72,27 +80,61 @@ public class InteractableObject : MonoBehaviour
         GameManager.instance.StopLoading();
         GameManager.instance.HideHint();
 
-        if (type == ObjectType.Item)
+        // 1. XỬ LÝ TỦ (MỚI)
+        if (type == ObjectType.Locker)
         {
-            if (specificItemType == ItemType.KeyCard)
-            {
-                // GỌI HÀM MỚI: Truyền thêm vị trí của cái thẻ (transform.position)
-                GameManager.instance.CollectKeyCard(transform.position);
+            if (lockerScript != null) lockerScript.EnterLocker();
+        }
 
-                Destroy(gameObject); // Xóa thẻ sau khi nhặt
-            }
-            else if (specificItemType == ItemType.Chip)
+        // 2. XỬ LÝ ITEM (ĐÃ KHÔI PHỤC)
+        else if (type == ObjectType.Item)
+        {
+            bool success = false;
+
+            if (specificItemType == ItemType.KeyCard || specificItemType == ItemType.Chip)
             {
-                // (Logic cho Chip nếu có sau này)
+                // Item cốt truyện (Thẻ) -> Nhặt luôn
+                if (specificItemType == ItemType.KeyCard)
+                {
+                    GameManager.instance.CollectKeyCard(transform.position);
+                }
+                success = true;
             }
             else
             {
                 // Item dùng được (Pin, Máu) -> Vào Hotbar
-                bool added = GameManager.instance.AddItemToHotbar(specificItemType, itemIcon);
-                if (added) Destroy(gameObject);
-                else GameManager.instance.ShowHint("Túi đồ đã đầy!");
+                if (GameManager.instance.AddItemToHotbar(specificItemType, itemIcon))
+                {
+                    success = true;
+                }
+                else
+                {
+                    GameManager.instance.ShowHint("Túi đồ đã đầy!");
+                }
+            }
+
+            if (success)
+            {
+                Destroy(gameObject); // Xóa vật phẩm (Marker con sẽ tự mất theo)
             }
         }
+
+        // 3. XỬ LÝ MÁY TÍNH
+        else if (type == ObjectType.Computer)
+        {
+            if (GameManager.instance.IsHoldingItem(ItemType.Battery))
+            {
+                isComputerOn = true;
+                if (screenCanvas != null) screenCanvas.SetActive(true);
+                if (passwordText != null) passwordText.text = "PASSWORD\n" + passwordContent;
+
+                GameManager.instance.RemoveCurrentItem();
+
+                if (questMarker != null) Destroy(questMarker);
+            }
+        }
+
+        // 4. XỬ LÝ CỬA
         else if (type == ObjectType.Door)
         {
             if (GameManager.instance.collectedKeyCards >= 10)
@@ -103,19 +145,8 @@ public class InteractableObject : MonoBehaviour
                 else GameManager.instance.WinGame();
             }
         }
-        else if (type == ObjectType.Computer)
-        {
-            // Kiểm tra lần nữa cho chắc
-            if (GameManager.instance.IsHoldingItem(ItemType.Battery))
-            {
-                isComputerOn = true;
-                if (screenCanvas != null) screenCanvas.SetActive(true);
-                if (passwordText != null) passwordText.text = "PASSWORD\n" + passwordContent;
 
-                // Dùng xong thì xóa Pin khỏi tay
-                GameManager.instance.RemoveCurrentItem();
-            }
-        }
+        // 5. XỬ LÝ KEYPAD
         else if (type == ObjectType.Keypad)
         {
             if (keypadController != null) keypadController.ActivateKeypad();
