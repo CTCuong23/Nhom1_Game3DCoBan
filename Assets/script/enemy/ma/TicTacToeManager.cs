@@ -10,7 +10,10 @@ public class TicTacToeManager : MonoBehaviour
     [Header("Setup UI")]
     public Button[] buttons;
     public TextMeshProUGUI[] buttonTexts;
-    public GameObject gameUI;
+
+    // Đổi tên cho rõ nghĩa: Chỉ kéo cái nhóm UI phụ (Tâm ngắm, Hint) vào đây
+    // ĐỪNG KÉO THANH MÁU VÀO ĐÂY
+    public GameObject hudToHide;
 
     [Header("Setup Cinematic")]
     public CinemachineVirtualCamera caroCamera;
@@ -20,7 +23,9 @@ public class TicTacToeManager : MonoBehaviour
     [Header("Setup Con Ma")]
     public Animator ghostAnimator;
     public AudioSource ghostAudioSource;
-    public AudioClip laughSound;
+
+    // --- SỬA: DÙNG MẢNG ĐỂ CHỨA NHIỀU TIẾNG CƯỜI ---
+    public AudioClip[] laughSounds; // Kéo 3 file âm thanh vào đây
     public AudioClip jumpscareSound;
 
     [Header("Game Over & Win")]
@@ -35,16 +40,13 @@ public class TicTacToeManager : MonoBehaviour
     private int movesCount = 0;
 
     [HideInInspector] public float lastCloseTime = 0f;
-
-    // --- BIẾN MỚI ĐỂ FIX LỖI ---
-    private float gameStartTime = 0f; // Thời điểm bắt đầu game
-    // ---------------------------
+    private float gameStartTime = 0f;
 
     private PlayerStats playerStats;
+    public GameObject tableLight;
 
     void Start()
     {
-        // Auto tìm Text
         if (buttonTexts == null || buttonTexts.Length != buttons.Length)
         {
             buttonTexts = new TextMeshProUGUI[buttons.Length];
@@ -69,9 +71,6 @@ public class TicTacToeManager : MonoBehaviour
 
     void Update()
     {
-        // --- ĐOẠN FIX QUAN TRỌNG ---
-        // Chỉ cho phép thoát nếu game đã chạy được hơn 0.5 giây
-        // (Để tránh xung đột với nút F lúc bắt đầu)
         if (gameActive && Input.GetKeyDown(KeyCode.F) && Time.timeScale != 0)
         {
             if (Time.time > gameStartTime + 0.5f)
@@ -79,7 +78,6 @@ public class TicTacToeManager : MonoBehaviour
                 CloseGame();
             }
         }
-        // ---------------------------
 
         if (gameActive && Cursor.lockState != CursorLockMode.None)
         {
@@ -93,7 +91,8 @@ public class TicTacToeManager : MonoBehaviour
         if (gameActive) return;
 
         gameActive = true;
-        gameStartTime = Time.time; // --- GHI LẠI GIỜ BẮT ĐẦU ---
+        gameStartTime = Time.time;
+        StartCoroutine(EnableLightWithDelay());
 
         caroCamera.Priority = 20;
         if (faceCamera != null) faceCamera.Priority = 0;
@@ -104,13 +103,13 @@ public class TicTacToeManager : MonoBehaviour
             foreach (var r in renderers) r.enabled = false;
         }
 
-        if (gameUI != null) gameUI.SetActive(false);
+        // CHỈ TẮT UI PHỤ, GIỮ LẠI THANH MÁU
+        if (hudToHide != null) hudToHide.SetActive(false);
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         ResetBoard();
     }
-
-    // ... (Giữ nguyên phần còn lại không thay đổi) ...
 
     void OnPlayerClick(int index)
     {
@@ -131,13 +130,27 @@ public class TicTacToeManager : MonoBehaviour
         {
             int randomIndex = emptySlots[Random.Range(0, emptySlots.Count)];
             MakeMove(randomIndex, "O");
-            if (ghostAudioSource != null && laughSound != null) ghostAudioSource.PlayOneShot(laughSound);
+
+            // --- LOGIC RANDOM TIẾNG CƯỜI MỚI ---
+            if (ghostAudioSource != null && laughSounds != null && laughSounds.Length > 0)
+            {
+                // Chọn ngẫu nhiên 1 âm thanh trong danh sách
+                int randomSoundIndex = Random.Range(0, laughSounds.Length);
+                AudioClip clipToPlay = laughSounds[randomSoundIndex];
+
+                if (clipToPlay != null)
+                    ghostAudioSource.PlayOneShot(clipToPlay);
+            }
+            // ------------------------------------
 
             if (CheckWin("O")) StartCoroutine(TriggerJumpscare());
             else if (movesCount >= 9) StartCoroutine(ResetWithDelay());
             else isPlayerTurn = true;
         }
     }
+
+    // ... (Giữ nguyên các hàm Jumpscare, ShowDeathPanel...)
+    // (Đoạn dưới này y hệt code cũ, tui chỉ copy lại cho đủ file)
 
     IEnumerator TriggerJumpscare()
     {
@@ -172,13 +185,17 @@ public class TicTacToeManager : MonoBehaviour
 
     void ShowDeathPanel()
     {
-        if (gameUI != null) gameUI.SetActive(true);
+        // Khi chết thì hiện lại mọi UI
+        if (hudToHide != null) hudToHide.SetActive(true);
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         if (deathPanel != null)
         {
-            if (gameUI != null && deathPanel.transform.parent == gameUI.transform)
-                deathPanel.transform.SetParent(gameUI.transform.parent);
+            // Đảm bảo cha của DeathPanel (là Gameplay_Total_Group) phải đang bật
+            if (deathPanel.transform.parent != null)
+                deathPanel.transform.parent.gameObject.SetActive(true);
+
             deathPanel.SetActive(true);
             deathPanel.transform.SetAsLastSibling();
             Script.UI.GameController.PauseGame(deathPanel);
@@ -211,6 +228,7 @@ public class TicTacToeManager : MonoBehaviour
     {
         lastCloseTime = Time.time;
         gameActive = false;
+        if (tableLight != null) tableLight.SetActive(false);
 
         caroCamera.Priority = 0;
         if (faceCamera != null) faceCamera.Priority = 0;
@@ -227,11 +245,23 @@ public class TicTacToeManager : MonoBehaviour
             foreach (var r in renderers) r.enabled = true;
         }
 
-        if (gameUI != null) gameUI.SetActive(true);
+        // Hiện lại UI phụ khi thoát game
+        if (hudToHide != null) hudToHide.SetActive(true);
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
         ResetBoard();
+    }
+    IEnumerator EnableLightWithDelay()
+    {
+        // Đợi 1.5 giây (Bro có thể chỉnh số này cho khớp với tốc độ Camera của bro)
+        yield return new WaitForSeconds(1.5f);
+
+        // Kiểm tra lại: Nếu game vẫn đang chơi thì mới bật (đề phòng vừa vào đã thoát)
+        if (gameActive && tableLight != null)
+        {
+            tableLight.SetActive(true);
+        }
     }
 }
