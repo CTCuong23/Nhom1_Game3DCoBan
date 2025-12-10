@@ -2,50 +2,85 @@
 
 public class GhostInteract : MonoBehaviour
 {
-    public TicTacToeManager gameManager;
+    [Header("Kéo thả")]
+    public TicTacToeManager gameManager; // Kéo CaroBoard vào đây
+
+    [Header("Cài đặt")]
     public string hintMessage = "Nhấn F để thách đấu";
+    public float interactRange = 4f; // Khoảng cách 4 mét là chơi được
 
-    private bool isPlayerNearby = false;
+    private Transform playerTransform;
 
-    void OnTriggerEnter(Collider other)
+    void Start()
     {
-        if (other.CompareTag("Player")) isPlayerNearby = true;
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
+        // Tự tìm thằng Player, khỏi lo bị mất kết nối
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
         {
-            isPlayerNearby = false;
-            GameManager.instance.HideHint();
+            playerTransform = player.transform;
+        }
+        else
+        {
+            Debug.LogError("❌ LỖI: Không tìm thấy Player! Xem lại Tag 'Player' trên nhân vật chưa?");
         }
     }
 
     void Update()
     {
-        // 1. Nếu game đang Pause (TimeScale = 0) -> KHÔNG LÀM GÌ CẢ (Fix lỗi nhấn F khi chết)
+        // 1. Kiểm tra an toàn
+        if (playerTransform == null || gameManager == null) return;
+
+        // 2. Nếu game đang Pause (TimeScale = 0) -> Nghỉ
         if (Time.timeScale == 0) return;
 
-        if (isPlayerNearby)
+        // --- CÔNG NGHỆ RADAR: Tự đo khoảng cách ---
+        // Không cần Trigger, không cần va chạm, cứ gần là tính
+        float distance = Vector3.Distance(transform.position, playerTransform.position);
+        bool isNearby = distance <= interactRange;
+
+        if (isNearby)
         {
+            // Chỉ xử lý khi game cờ CHƯA bắt đầu
             if (!gameManager.gameActive)
             {
-                GameManager.instance.ShowHint(hintMessage);
-
+                // A. XỬ LÝ NHẤN NÚT F
                 if (Input.GetKeyDown(KeyCode.F))
                 {
-                    // Check thời gian đóng cũ (để tránh spam)
+                    // Chặn spam nút (nếu vừa đóng game xong)
                     if (Time.time < gameManager.lastCloseTime + 0.5f) return;
 
-                    gameManager.StartGame();
-                    GameManager.instance.HideHint();
+                    Debug.Log("✅ Đã nhấn F! Bắt đầu StartGame()...");
+
+                    // Tắt gợi ý trước rồi mới start game
+                    if (GameManager.instance != null) GameManager.instance.HideHint();
+
+                    gameManager.StartGame(); // <--- GỌI HÀM NÀY CAM MỚI ZOOM
+                    return;
                 }
+
+                // B. HIỆN CHỮ GỢI Ý (Nếu chưa bấm gì)
+                if (GameManager.instance != null) GameManager.instance.ShowHint(hintMessage);
             }
             else
             {
-                // Khi đang chơi thì tắt gợi ý
+                // Nếu đang chơi cờ thì tắt gợi ý
+                if (GameManager.instance != null) GameManager.instance.HideHint();
+            }
+        }
+        else
+        {
+            // Nếu đi ra xa (ngoài 4 mét) -> Tắt gợi ý
+            if (GameManager.instance != null && GameManager.instance.hintText.text == hintMessage)
+            {
                 GameManager.instance.HideHint();
             }
         }
+    }
+
+    // Vẽ vòng tròn đỏ trong Scene để ông dễ căn chỉnh
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, interactRange);
     }
 }
