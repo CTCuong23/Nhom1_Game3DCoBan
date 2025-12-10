@@ -7,28 +7,18 @@ public class PlayerInteraction : MonoBehaviour
     public LayerMask interactableLayer;
 
     private float currentHoldTime = 0f;
-
-    // Biến lưu trữ vật phẩm đang đứng gần (Xử lý trong Update cho mượt)
     private InteractableObject currentTriggerObj;
 
-    // --- PHẦN 1: XÁC ĐỊNH ĐANG ĐỨNG GẦN CÁI GÌ ---
     private void OnTriggerEnter(Collider other)
     {
         InteractableObject obj = other.GetComponent<InteractableObject>();
-        if (obj != null)
-        {
-            currentTriggerObj = obj; // Lưu lại đối tượng
-        }
+        if (obj != null) currentTriggerObj = obj;
     }
 
     private void OnTriggerStay(Collider other)
     {
-        // Vẫn giữ để chắc chắn cập nhật nếu có thay đổi
         InteractableObject obj = other.GetComponent<InteractableObject>();
-        if (obj != null && currentTriggerObj != obj)
-        {
-            currentTriggerObj = obj;
-        }
+        if (obj != null && currentTriggerObj != obj) currentTriggerObj = obj;
     }
 
     private void OnTriggerExit(Collider other)
@@ -37,50 +27,59 @@ public class PlayerInteraction : MonoBehaviour
         if (obj != null && obj == currentTriggerObj)
         {
             ResetInteraction();
-            currentTriggerObj = null; // Xóa mục tiêu khi đi ra xa
+            currentTriggerObj = null;
         }
     }
 
-    // --- PHẦN 2: XỬ LÝ PHÍM BẤM (Trong Update để nhạy 100%) ---
     void Update()
     {
-        // Nếu không đứng gần cái gì hoặc đang dùng Keypad thì thôi
+        // Kiểm tra an toàn
         if (currentTriggerObj == null || GameManager.instance.isUsingKeypad) return;
 
         InteractableObject obj = currentTriggerObj;
 
-        // 1. LOGIC KEYPAD (Phím F) --> ƯU TIÊN SỐ 1
+        // 1. LOGIC KEYPAD (Phím F)
         if (obj.type == InteractableObject.ObjectType.Keypad)
         {
             GameManager.instance.ShowHint(obj.GetHintText());
-
             if (Input.GetKeyDown(KeyCode.F))
             {
-                obj.PerformAction(); // Gọi Keypad Zoom ngay lập tức
+                obj.PerformAction();
             }
-            return; // Xong việc Keypad, không chạy phần dưới
+            return;
         }
 
         // 2. LOGIC CỬA & MÁY TÍNH (Phím E)
 
-        // Kiểm tra điều kiện
+        // Kiểm tra Máy tính đã bật chưa
         if (obj.type == InteractableObject.ObjectType.Computer && obj.isComputerOn)
         {
-            GameManager.instance.HideHint(); // Đảm bảo tắt bảng gợi ý đi
-            return;
-        }
-        if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.currentItems < 3)
-        {
-            GameManager.instance.ShowHint(obj.GetHintText());
-            return;
-        }
-        if (obj.type == InteractableObject.ObjectType.Computer && !GameManager.instance.hasBattery)
-        {
-            GameManager.instance.ShowHint(obj.GetHintText());
+            GameManager.instance.HideHint();
             return;
         }
 
-        // Hiện gợi ý chung
+        // --- CẬP NHẬT LOGIC MỚI TẠI ĐÂY ---
+
+        // Kiểm tra Cửa: Dùng biến collectedKeyCards mới (10 thẻ)
+        if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.collectedKeyCards < 10)
+        {
+            GameManager.instance.ShowHint(obj.GetHintText());
+            return; // Chưa đủ thẻ thì không cho giữ E
+        }
+
+        // Kiểm tra Máy tính: Check xem tay có đang cầm Pin không?
+        if (obj.type == InteractableObject.ObjectType.Computer)
+        {
+            // Nếu tay KHÔNG cầm Pin -> Chỉ hiện gợi ý, không cho bấm
+            if (!GameManager.instance.IsHoldingItem(InteractableObject.ItemType.Battery))
+            {
+                GameManager.instance.ShowHint(obj.GetHintText());
+                return;
+            }
+        }
+        // -----------------------------------
+
+        // Hiện gợi ý (Ví dụ: "Giữ E để mở")
         GameManager.instance.ShowHint(obj.GetHintText());
 
         // Xử lý giữ phím E
