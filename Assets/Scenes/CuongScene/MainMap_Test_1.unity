@@ -14947,6 +14947,14 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.707106
       objectReference: {fileID: 0}
+    - target: {fileID: 2804212400955620928, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: MinDistance
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2804212400955620928, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 0.465
+      objectReference: {fileID: 0}
     - target: {fileID: 2816043087961737051, guid: 12228c005b75f9a42a08614ca7875061, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.051689893
@@ -33182,6 +33190,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 938886213701384947, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
+      propertyPath: m_text
+      value: "Tho\xE1t"
+      objectReference: {fileID: 0}
     - target: {fileID: 2547046826876706943, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 55
@@ -33285,6 +33297,14 @@ PrefabInstance:
     - target: {fileID: 4710855110104008648, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
       propertyPath: m_fontStyle
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5407629916435246388, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
+      propertyPath: m_text
+      value: "M\xE0n H\xECnh Ch\xEDnh "
+      objectReference: {fileID: 0}
+    - target: {fileID: 8743880547321708747, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
+      propertyPath: m_text
+      value: "Ch\u01A1i L\u1EA1i"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
