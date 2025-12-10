@@ -6,39 +6,56 @@ public class InteractableObject : MonoBehaviour
 {
     public enum ObjectType { Item, Door, Computer, Keypad }
     public ObjectType type;
+    public enum ItemType { None, Battery, HealthPotion, KeyCard, Chip }
 
-    // Phân loại Item kỹ hơn
-    public enum ItemType
-    {
-        None,
-        Battery,    // Dùng được -> Vào Hotbar
-        HealthPotion, // Dùng được -> Vào Hotbar
-        KeyCard,    // Cốt truyện -> Bay lên góc
-        Chip        // Cốt truyện -> Bay lên góc
-    }
+    [Header("--- QUEST MARKER ---")]
+    [Tooltip("Kéo dấu chấm than vào đây. Nếu để trống, code sẽ tự tìm object tên 'QuestMarker' trong đám con.")]
+    public GameObject questMarker;
 
     [Header("Loại vật phẩm")]
     public ItemType specificItemType;
-
-    [Header("Hình ảnh (Cho Hotbar)")]
-    public Sprite itemIcon; // <--- KÉO ẢNH ICON CỤC PIN VÀO ĐÂY
-
-    [Header("Cài đặt chung")]
+    public Sprite itemIcon;
     public float holdTime = 2f;
 
-    [Header("Cài đặt cho Cửa")]
+    [Header("Cài đặt khác")]
     public Animator doorAnimator;
     public Collider doorBlockCollider;
     public PlayableDirector timelineDirector;
-
-    [Header("Cài đặt cho Máy Tính")]
     public GameObject screenCanvas;
     public TextMeshProUGUI passwordText;
     public string passwordContent = "1997";
     public bool isComputerOn = false;
-
-    [Header("Cài đặt cho Keypad")]
     public KeypadController keypadController;
+
+    void Start()
+    {
+        // --- TỰ ĐỘNG TÌM & BẬT MARKER ---
+        if (questMarker == null)
+        {
+            // Nếu bro quên kéo, code sẽ thử tìm đứa con nào có tên chứa chữ "Marker"
+            foreach (Transform child in transform)
+            {
+                if (child.name.Contains("Marker") || child.name.Contains("marker"))
+                {
+                    questMarker = child.gameObject;
+                    break;
+                }
+            }
+        }
+
+        // Nếu tìm thấy marker -> BẮT BUỘC BẬT NÓ LÊN
+        if (questMarker != null)
+        {
+            questMarker.SetActive(true);
+
+            // Fix lỗi Scale tí hon: Nếu scale quá bé (< 0.1), tự động phóng to lên
+            if (questMarker.transform.lossyScale.x < 0.1f)
+            {
+                // Mẹo: Unparent ra để scale to, rồi parent lại (hoặc bro tự chỉnh tay cho đẹp)
+                // Debug.LogWarning("⚠️ Dấu chấm than quá bé! Hãy chỉnh Scale to lên trong Inspector.");
+            }
+        }
+    }
 
     public string GetHintText()
     {
@@ -46,7 +63,6 @@ public class InteractableObject : MonoBehaviour
 
         if (type == ObjectType.Door)
         {
-            // Yêu cầu 10 thẻ
             if (GameManager.instance.collectedKeyCards >= 10) return "Đã đủ 10 thẻ\nGiữ E để thoát";
             else return $"Cần tìm thẻ ({GameManager.instance.collectedKeyCards}/10)";
         }
@@ -54,12 +70,8 @@ public class InteractableObject : MonoBehaviour
         if (type == ObjectType.Computer)
         {
             if (isComputerOn) return "";
-
-            // Logic mới: Kiểm tra xem tay có đang cầm Pin không?
-            if (GameManager.instance.IsHoldingItem(ItemType.Battery))
-                return "Giữ E để lắp Pin";
-            else
-                return "Cần trang bị Pin (Phím 1-5)";
+            if (GameManager.instance.IsHoldingItem(ItemType.Battery)) return "Giữ E để lắp Pin";
+            else return "Cần trang bị Pin (Phím 1-5)";
         }
 
         if (type == ObjectType.Keypad) return "Nhấn F để nhập mật khẩu";
@@ -72,27 +84,38 @@ public class InteractableObject : MonoBehaviour
         GameManager.instance.StopLoading();
         GameManager.instance.HideHint();
 
+        // --- XỬ LÝ ITEM ---
         if (type == ObjectType.Item)
         {
-            if (specificItemType == ItemType.KeyCard)
-            {
-                // GỌI HÀM MỚI: Truyền thêm vị trí của cái thẻ (transform.position)
-                GameManager.instance.CollectKeyCard(transform.position);
+            bool success = false;
 
-                Destroy(gameObject); // Xóa thẻ sau khi nhặt
-            }
-            else if (specificItemType == ItemType.Chip)
+            if (specificItemType == ItemType.KeyCard || specificItemType == ItemType.Chip)
             {
-                // (Logic cho Chip nếu có sau này)
+                if (specificItemType == ItemType.KeyCard) GameManager.instance.CollectKeyCard(transform.position);
+                success = true;
             }
             else
             {
-                // Item dùng được (Pin, Máu) -> Vào Hotbar
-                bool added = GameManager.instance.AddItemToHotbar(specificItemType, itemIcon);
-                if (added) Destroy(gameObject);
+                if (GameManager.instance.AddItemToHotbar(specificItemType, itemIcon)) success = true;
                 else GameManager.instance.ShowHint("Túi đồ đã đầy!");
             }
+
+            if (success) Destroy(gameObject); // Marker con tự hủy theo
         }
+        // --- XỬ LÝ MÁY TÍNH ---
+        else if (type == ObjectType.Computer)
+        {
+            if (GameManager.instance.IsHoldingItem(ItemType.Battery))
+            {
+                isComputerOn = true;
+                if (screenCanvas != null) screenCanvas.SetActive(true);
+                if (passwordText != null) passwordText.text = "PASSWORD\n" + passwordContent;
+                GameManager.instance.RemoveCurrentItem();
+
+                if (questMarker != null) Destroy(questMarker); // Xóa marker thủ công
+            }
+        }
+        // --- XỬ LÝ CỬA ---
         else if (type == ObjectType.Door)
         {
             if (GameManager.instance.collectedKeyCards >= 10)
@@ -103,19 +126,7 @@ public class InteractableObject : MonoBehaviour
                 else GameManager.instance.WinGame();
             }
         }
-        else if (type == ObjectType.Computer)
-        {
-            // Kiểm tra lần nữa cho chắc
-            if (GameManager.instance.IsHoldingItem(ItemType.Battery))
-            {
-                isComputerOn = true;
-                if (screenCanvas != null) screenCanvas.SetActive(true);
-                if (passwordText != null) passwordText.text = "PASSWORD\n" + passwordContent;
-
-                // Dùng xong thì xóa Pin khỏi tay
-                GameManager.instance.RemoveCurrentItem();
-            }
-        }
+        // --- XỬ LÝ KEYPAD ---
         else if (type == ObjectType.Keypad)
         {
             if (keypadController != null) keypadController.ActivateKeypad();
