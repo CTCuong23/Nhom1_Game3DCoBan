@@ -14,7 +14,14 @@ public partial class MoveToPlayerAction : Action
     [SerializeReference] public BlackboardVariable<float> StopChaseDistance;
 
     private NavMeshAgent agent;
-    private float _nextUpdatePathTime;
+
+    private float _nextUpdatePathTime; // Biến đếm thời gian
+
+    // Biến kiểm tra để đảm bảo Start/Stop luôn đi theo cặp
+    private bool hasStartedChase = false;
+
+    
+
 
     protected override Status OnStart()
     {
@@ -22,11 +29,24 @@ public partial class MoveToPlayerAction : Action
         agent = GameObject.GetComponent<NavMeshAgent>();
         if (agent == null) return Status.Failure;
 
+
+        
+
+
+        
+
         // Nếu Player đang trốn -> Thất bại ngay (Để quái chuyển sang hành động khác)
         if (GameManager.instance.isPlayerHiding) return Status.Failure;
 
         EnemySound soundScript = GameObject.GetComponent<EnemySound>();
         if (soundScript != null) soundScript.PlayAlertSound();
+
+        // --- XỬ LÝ NHẠC (MỚI) ---
+        if (MusicManager.instance != null)
+        {
+            MusicManager.instance.StartChase();
+            hasStartedChase = true; // Đánh dấu là đã báo nhạc rồi
+        }
 
         agent.speed = Speed.Value;
         agent.isStopped = false;
@@ -67,5 +87,17 @@ public partial class MoveToPlayerAction : Action
         }
 
         return Status.Running;
+    }
+
+    // --- HÀM MỚI QUAN TRỌNG: OnEnd ---
+    // Hàm này tự động chạy khi cái node Chase này kết thúc (dù thành công hay thất bại)
+    protected override void OnEnd()
+    {
+        // Nếu trước đó đã bật nhạc Chase thì giờ tắt đi
+        if (hasStartedChase && MusicManager.instance != null)
+        {
+            MusicManager.instance.StopChase();
+            hasStartedChase = false;
+        }
     }
 }
