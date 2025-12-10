@@ -3,6 +3,7 @@ using UnityEngine.Playables;
 using TMPro;
 using System.Collections;
 using StarterAssets;
+using Cinemachine; // <--- NHỚ THÊM DÒNG NÀY
 
 public class OpeningCutscene : MonoBehaviour
 {
@@ -15,29 +16,30 @@ public class OpeningCutscene : MonoBehaviour
     public GameObject skipHintObject;
     public float timeShowHint = 3f;
 
-    [Header("Cấu hình")]
-    public float blendBackTime = 2f;
-
     private bool hasSkipped = false;
     private Vector3 startPos;
     private Quaternion startRot;
 
-    // --- ĐỔI TỪ VOID SANG IENUMERATOR ĐỂ CHỜ ĐỢI ---
+    // Biến lưu trữ cài đặt Camera cũ để khôi phục sau khi Cut
+    private CinemachineBlendDefinition originalBlend;
+    private CinemachineBrain mainCameraBrain;
+
     IEnumerator Start()
     {
-        // 1. Lưu vị trí gốc
+        // Lưu vị trí gốc
         if (player != null)
         {
             startPos = player.transform.position;
             startRot = player.transform.rotation;
         }
 
-        // 2. CHỜ 1 KHUNG HÌNH (Để GameManager chạy xong việc bật UI của nó trước đã)
+        // Lấy Brain của Camera chính để sau này chỉnh Blend
+        if (Camera.main != null)
+            mainCameraBrain = Camera.main.GetComponent<CinemachineBrain>();
+
         yield return null;
 
-        // 3. GIỜ MỚI BẮT ĐẦU XỬ LÝ (Quyền lực tối cao)
-
-        // Tắt UI Gameplay (Lần này chắc chắn tắt được)
+        // Tắt UI Gameplay
         if (GameManager.instance != null && GameManager.instance.gameplayUI != null)
             GameManager.instance.gameplayUI.SetActive(false);
 
@@ -80,6 +82,17 @@ public class OpeningCutscene : MonoBehaviour
     void SkipCutscene()
     {
         hasSkipped = true;
+
+        // --- XỬ LÝ INSTANT CUT (CẮT NGAY LẬP TỨC) ---
+        if (mainCameraBrain != null)
+        {
+            // 1. Lưu lại kiểu Blend cũ (thường là EaseInOut 2s)
+            originalBlend = mainCameraBrain.m_DefaultBlend;
+
+            // 2. Chỉnh Blend về 0 (Cắt cái rụp)
+            mainCameraBrain.m_DefaultBlend = new CinemachineBlendDefinition(CinemachineBlendDefinition.Style.Cut, 0);
+        }
+
         if (timelineDirector != null) timelineDirector.Stop();
     }
 
@@ -107,7 +120,7 @@ public class OpeningCutscene : MonoBehaviour
             if (cc != null) cc.enabled = true;
         }
 
-        // Dọn dẹp
+        // Tắt Camera Cutscene -> Vì Blend đang là 0 nên nó sẽ nhảy bụp về Camera Player
         if (cutsceneCamHolder != null) cutsceneCamHolder.SetActive(false);
         if (skipHintObject != null) skipHintObject.SetActive(false);
 
@@ -117,9 +130,30 @@ public class OpeningCutscene : MonoBehaviour
         var input = player.GetComponent<StarterAssetsInputs>();
         if (input != null) input.cursorInputForLook = true;
 
-        // Bật lại UI
         if (GameManager.instance != null && GameManager.instance.gameplayUI != null)
             GameManager.instance.gameplayUI.SetActive(true);
+
+        // --- KHÔI PHỤC LẠI BLEND CAMERA (Để chơi game bình thường nó còn mượt) ---
+        if (mainCameraBrain != null && hasSkipped)
+        {
+            StartCoroutine(RestoreCameraBlend());
+        }
+        else
+        {
+            this.enabled = false;
+        }
+    }
+
+    IEnumerator RestoreCameraBlend()
+    {
+        // Đợi 1 khung hình cho việc chuyển Camera hoàn tất
+        yield return null;
+
+        // Trả lại cài đặt cũ
+        if (mainCameraBrain != null)
+        {
+            mainCameraBrain.m_DefaultBlend = originalBlend;
+        }
 
         this.enabled = false;
     }
