@@ -51,7 +51,7 @@ public class InteractableObject : MonoBehaviour
         if (questMarker != null) questMarker.SetActive(true);
     }
 
-    public string GetHintText()
+    public virtual string GetHintText()
     {
         if (type == ObjectType.Item) return "Giữ E để nhặt " + specificItemType.ToString();
 
@@ -75,7 +75,7 @@ public class InteractableObject : MonoBehaviour
         return "";
     }
 
-    public void PerformAction()
+    public virtual void PerformAction()
     {
         GameManager.instance.StopLoading();
         GameManager.instance.HideHint();
