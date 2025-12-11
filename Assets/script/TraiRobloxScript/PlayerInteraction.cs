@@ -7,28 +7,18 @@ public class PlayerInteraction : MonoBehaviour
     public LayerMask interactableLayer;
 
     private float currentHoldTime = 0f;
-
-    // Biến lưu trữ vật phẩm đang đứng gần (Xử lý trong Update cho mượt)
     private InteractableObject currentTriggerObj;
 
-    // --- PHẦN 1: XÁC ĐỊNH ĐANG ĐỨNG GẦN CÁI GÌ ---
     private void OnTriggerEnter(Collider other)
     {
         InteractableObject obj = other.GetComponent<InteractableObject>();
-        if (obj != null)
-        {
-            currentTriggerObj = obj; // Lưu lại đối tượng
-        }
+        if (obj != null) currentTriggerObj = obj;
     }
 
     private void OnTriggerStay(Collider other)
     {
-        // Vẫn giữ để chắc chắn cập nhật nếu có thay đổi
         InteractableObject obj = other.GetComponent<InteractableObject>();
-        if (obj != null && currentTriggerObj != obj)
-        {
-            currentTriggerObj = obj;
-        }
+        if (obj != null && currentTriggerObj != obj) currentTriggerObj = obj;
     }
 
     private void OnTriggerExit(Collider other)
@@ -37,44 +27,48 @@ public class PlayerInteraction : MonoBehaviour
         if (obj != null && obj == currentTriggerObj)
         {
             ResetInteraction();
-            currentTriggerObj = null; // Xóa mục tiêu khi đi ra xa
+            currentTriggerObj = null;
         }
     }
 
-    // --- PHẦN 2: XỬ LÝ PHÍM BẤM (Trong Update để nhạy 100%) ---
     void Update()
     {
-        // Nếu không đứng gần cái gì hoặc đang dùng Keypad thì thôi
+        // Kiểm tra an toàn
         if (currentTriggerObj == null || GameManager.instance.isUsingKeypad) return;
 
         InteractableObject obj = currentTriggerObj;
 
-        // 1. LOGIC KEYPAD (Phím F) --> ƯU TIÊN SỐ 1
-        if (obj.type == InteractableObject.ObjectType.Keypad)
+        // --- ƯU TIÊN 1: PHÍM F (Keypad & Tủ) ---
+        if (obj.type == InteractableObject.ObjectType.Keypad || obj.type == InteractableObject.ObjectType.Locker)
         {
             GameManager.instance.ShowHint(obj.GetHintText());
 
             if (Input.GetKeyDown(KeyCode.F))
             {
-                obj.PerformAction(); // Gọi Keypad Zoom ngay lập tức
+                obj.PerformAction();
             }
-            return; // Xong việc Keypad, không chạy phần dưới
+            return; // Xong việc, không chạy phần dưới
         }
 
-        // 2. LOGIC CỬA & MÁY TÍNH (Phím E)
+        // --- ƯU TIÊN 2: PHÍM E (Nhặt đồ, Cửa, Máy tính) ---
 
-        // Kiểm tra điều kiện
-        if (obj.type == InteractableObject.ObjectType.Computer && obj.isComputerOn)
+        // Kiểm tra điều kiện Máy tính
+        if (obj.type == InteractableObject.ObjectType.Computer)
         {
-            GameManager.instance.HideHint(); // Đảm bảo tắt bảng gợi ý đi
-            return;
+            if (obj.isComputerOn)
+            {
+                GameManager.instance.HideHint();
+                return;
+            }
+            if (!GameManager.instance.IsHoldingItem(InteractableObject.ItemType.Battery))
+            {
+                GameManager.instance.ShowHint(obj.GetHintText());
+                return;
+            }
         }
-        if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.currentItems < 3)
-        {
-            GameManager.instance.ShowHint(obj.GetHintText());
-            return;
-        }
-        if (obj.type == InteractableObject.ObjectType.Computer && !GameManager.instance.hasBattery)
+
+        // Kiểm tra điều kiện Cửa
+        if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.collectedKeyCards < 10)
         {
             GameManager.instance.ShowHint(obj.GetHintText());
             return;
@@ -83,7 +77,7 @@ public class PlayerInteraction : MonoBehaviour
         // Hiện gợi ý chung
         GameManager.instance.ShowHint(obj.GetHintText());
 
-        // Xử lý giữ phím E
+        // Xử lý Giữ Phím E (ĐÃ KHÔI PHỤC)
         if (Input.GetKey(KeyCode.E))
         {
             currentHoldTime += Time.deltaTime;

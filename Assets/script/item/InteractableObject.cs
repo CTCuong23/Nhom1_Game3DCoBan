@@ -4,15 +4,20 @@ using TMPro;
 
 public class InteractableObject : MonoBehaviour
 {
-    // Thêm Keypad vào đây
-    public enum ObjectType { Item, Door, Computer, Keypad }
+    public enum ObjectType { Item, Door, Computer, Keypad, Locker }
     public ObjectType type;
 
-    public enum ItemType { None, Battery, KeyCard, Chip }
+    public enum ItemType { None, Battery, HealthPotion, KeyCard, Chip }
+
+    [Header("--- QUEST MARKER ---")]
+    public GameObject questMarker;
+
+    [Header("Cài đặt Tủ Trốn")]
+    public HidingLocker lockerScript;
+
     [Header("Loại vật phẩm")]
     public ItemType specificItemType;
-
-    [Header("Cài đặt chung")]
+    public Sprite itemIcon;
     public float holdTime = 2f;
 
     [Header("Cài đặt cho Cửa")]
@@ -27,8 +32,10 @@ public class InteractableObject : MonoBehaviour
     public bool isComputerOn = false;
 
     [Header("Cài đặt cho Keypad")]
-    public KeypadController keypadController; // Kéo script KeypadController vào đây
+
+
     public KeypadController keypadController;
+
 
     public virtual void Start()
     {
@@ -49,25 +56,24 @@ public class InteractableObject : MonoBehaviour
 
     public virtual string GetHintText()
     {
-        if (type == ObjectType.Item) return "Giữ E để nhặt";
+        if (type == ObjectType.Item) return "Giữ E để nhặt " + specificItemType.ToString();
+
+        if (type == ObjectType.Locker) return "Nhấn F để trốn";
 
         if (type == ObjectType.Door)
         {
-            if (GameManager.instance.currentItems >= 3) return "Đủ vật phẩm\nGiữ E để mở";
-            else return $"Chưa đủ đồ ({GameManager.instance.currentItems}/3)";
+            if (GameManager.instance.collectedKeyCards >= 10) return "Đã đủ 10 thẻ\nGiữ E để thoát";
+            else return $"Cần tìm thẻ ({GameManager.instance.collectedKeyCards}/10)";
         }
 
         if (type == ObjectType.Computer)
         {
             if (isComputerOn) return "";
-            return GameManager.instance.hasBattery ? "Giữ E để khởi động" : "Cần Pin";
+            if (GameManager.instance.IsHoldingItem(ItemType.Battery)) return "Giữ E để lắp Pin";
+            else return "Cần trang bị Pin (Phím 1-5)";
         }
 
-        // --- LOGIC KEYPAD MỚI ---
-        if (type == ObjectType.Keypad)
-        {
-            return "Nhấn F để nhập mật khẩu";
-        }
+        if (type == ObjectType.Keypad) return "Nhấn F để nhập mật khẩu";
 
         return "";
     }
@@ -77,41 +83,82 @@ public class InteractableObject : MonoBehaviour
         GameManager.instance.StopLoading();
         GameManager.instance.HideHint();
 
-        if (type == ObjectType.Item)
+        // 1. XỬ LÝ TỦ (MỚI)
+        if (type == ObjectType.Locker)
         {
-            GameManager.instance.CollectItemAnimated(specificItemType);
-            Destroy(gameObject);
+            if (lockerScript != null) lockerScript.EnterLocker();
         }
-        else if (type == ObjectType.Door)
+
+        // 2. XỬ LÝ ITEM (ĐÃ KHÔI PHỤC)
+        else if (type == ObjectType.Item)
         {
-            if (doorAnimator != null) doorAnimator.SetTrigger("Open");
-            if (doorBlockCollider != null) doorBlockCollider.enabled = false;
-            if (timelineDirector != null) GameManager.instance.StartEndingSequence(timelineDirector);
-            else GameManager.instance.WinGame();
+            bool success = false;
+
+            if (specificItemType == ItemType.KeyCard || specificItemType == ItemType.Chip)
+            {
+                // Item cốt truyện (Thẻ) -> Nhặt luôn
+                if (specificItemType == ItemType.KeyCard)
+                {
+                    GameManager.instance.CollectKeyCard(transform.position);
+                }
+                success = true;
+            }
+            else
+            {
+                // Item dùng được (Pin, Máu) -> Vào Hotbar
+                if (GameManager.instance.AddItemToHotbar(specificItemType, itemIcon))
+                {
+                    success = true;
+                }
+                else
+                {
+                    GameManager.instance.ShowHint("Túi đồ đã đầy!");
+                }
+            }
+
+            if (success)
+            {
+                Destroy(gameObject); // Xóa vật phẩm (Marker con sẽ tự mất theo)
+            }
         }
+
+        // 3. XỬ LÝ MÁY TÍNH
         else if (type == ObjectType.Computer)
         {
-            isComputerOn = true;
-            if (screenCanvas != null) screenCanvas.SetActive(true);
-            if (passwordText != null) passwordText.text = "PASSWORD\n" + passwordContent;
+            if (GameManager.instance.IsHoldingItem(ItemType.Battery))
+            {
+                isComputerOn = true;
+                if (screenCanvas != null) screenCanvas.SetActive(true);
+                if (passwordText != null) passwordText.text = "PASSWORD\n" + passwordContent;
+
+                GameManager.instance.RemoveCurrentItem();
+
+                if (questMarker != null) Destroy(questMarker);
+            }
         }
-        // --- KÍCH HOẠT KEYPAD ---
+
+        // 4. XỬ LÝ CỬA
+        else if (type == ObjectType.Door)
+        {
+            if (GameManager.instance.collectedKeyCards >= 10)
+            {
+                if (doorAnimator != null) doorAnimator.SetTrigger("Open");
+                if (doorBlockCollider != null) doorBlockCollider.enabled = false;
+                if (timelineDirector != null) GameManager.instance.StartEndingSequence(timelineDirector);
+                else GameManager.instance.WinGame();
+            }
+        }
+
+        // 5. XỬ LÝ KEYPAD
         else if (type == ObjectType.Keypad)
         {
-            if (keypadController != null)
-            {
-                keypadController.ActivateKeypad();
-            }
+            if (keypadController != null) keypadController.ActivateKeypad();
         }
     }
 
-    // Hàm mở cửa do Keypad gọi khi nhập đúng pass
     public void OpenDoorByKeypad()
     {
         if (doorAnimator != null) doorAnimator.SetTrigger("Open");
         if (doorBlockCollider != null) doorBlockCollider.enabled = false;
-
-        // Phát âm thanh mở cửa ở đây nếu muốn
-        Debug.Log("Cửa đã mở do đúng mật khẩu!");
     }
 }
