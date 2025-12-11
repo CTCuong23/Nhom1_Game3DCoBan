@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 83d97de3219c7e341b2179bf5cde3f08
+timeCreated: 1437684367
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 41798
+  packageName: Sliding Tile Puzzle Game
+  packageVersion: 1.1
+  assetPath: Assets/HyperLuminal/SlidingTilePuzzle/Documentation/Sliding Tile Puzzle
+    Documentation.pdf
+  uploadId: 90111

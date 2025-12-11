@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c78156a8d0505db48bc2d754df2cd940
+timeCreated: 1429302324
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 41798
+  packageName: Sliding Tile Puzzle Game
+  packageVersion: 1.1
+  assetPath: Assets/HyperLuminal/SlidingTilePuzzle/Scenes/SlidingTilePuzzle.unity
+  uploadId: 90111
