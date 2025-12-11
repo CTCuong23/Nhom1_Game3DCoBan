@@ -29517,6 +29517,73 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.9999995, y: 2, z: 0.11689305}
   m_Center: {x: 0, y: 0, z: 0.03550134}
+--- !u!1001 &1589121987
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2138900105}
+    m_Modifications:
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 46.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5001729270631087262, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+      propertyPath: m_Name
+      value: QuestMarker_Prefab
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+--- !u!1 &1589121988 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5001729270631087262, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+  m_PrefabInstance: {fileID: 1589121987}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1589121989 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4922680775074821178, guid: db2c9f640cfb1114492a31923cc9fca4, type: 3}
+  m_PrefabInstance: {fileID: 1589121987}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1596651487
 GameObject:
   m_ObjectHideFlags: 0
@@ -39024,6 +39091,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.9999995, y: 2, z: 0.11689305}
   m_Center: {x: 0, y: 0, z: 0.03550134}
+--- !u!114 &2138900102 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2141524100141267507, guid: 844c204466f31ab449fd708fa609472d, type: 3}
+  m_PrefabInstance: {fileID: 3586869115232835503}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01d6dae9274dfac4897b631f599c8d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &2138900105 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2724006807532555630, guid: 844c204466f31ab449fd708fa609472d, type: 3}
+  m_PrefabInstance: {fileID: 3586869115232835503}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2141383488
 GameObject:
   m_ObjectHideFlags: 0
@@ -39575,6 +39658,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2141524100141267507, guid: 844c204466f31ab449fd708fa609472d, type: 3}
+      propertyPath: questMarker
+      value: 
+      objectReference: {fileID: 1589121988}
     - target: {fileID: 2724006807532555630, guid: 844c204466f31ab449fd708fa609472d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 48.52
@@ -39621,7 +39708,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2724006807532555630, guid: 844c204466f31ab449fd708fa609472d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1589121989}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 844c204466f31ab449fd708fa609472d, type: 3}
 --- !u!1 &3751477529377686826
@@ -39893,6 +39983,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8700669673776357714, guid: 7d6451059caeb7b469c69e46d9fae319, type: 3}
+      propertyPath: mainBreaker
+      value: 
+      objectReference: {fileID: 2138900102}
+    - target: {fileID: 8700669673776357714, guid: 7d6451059caeb7b469c69e46d9fae319, type: 3}
       propertyPath: powerTimerText
       value: 
       objectReference: {fileID: 774840954}
@@ -39902,7 +39996,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8700669673776357714, guid: 7d6451059caeb7b469c69e46d9fae319, type: 3}
       propertyPath: normalCycleDuration
-      value: 210
+      value: 300
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
