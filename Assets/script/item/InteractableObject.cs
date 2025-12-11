@@ -32,24 +32,10 @@ public class InteractableObject : MonoBehaviour
     public bool isComputerOn = false;
 
     [Header("Cài đặt cho Keypad")]
+
+
     public KeypadController keypadController;
 
-    void Start()
-    {
-        // Tự động tìm Marker nếu chưa kéo
-        if (questMarker == null)
-        {
-            foreach (Transform child in transform)
-            {
-                if (child.name.Contains("Marker") || child.name.Contains("marker"))
-                {
-                    questMarker = child.gameObject;
-                    break;
-                }
-            }
-        }
-        if (questMarker != null) questMarker.SetActive(true);
-    }
 
     public virtual void Start()
     {
