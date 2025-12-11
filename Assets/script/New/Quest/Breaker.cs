@@ -3,6 +3,23 @@
 // Kế thừa từ InteractableObject để dùng chung hệ thống E, Loading Bar
 public class Breaker : InteractableObject
 {
+    // THÊM "public override" VÀO ĐÂY
+    public override void Start()
+    {
+        // 1. Gọi hàm Start của cha (để nó tìm và gán QuestMarker)
+        base.Start();
+
+        // 2. Sau đó mới ẩn nó đi
+        ToggleMarker(false);
+    }
+
+    public void ToggleMarker(bool state)
+    {
+        if (questMarker != null)
+        {
+            questMarker.SetActive(state);
+        }
+    }
     public override string GetHintText()
     {
         // Nếu có điện rồi thì báo khác

@@ -22,6 +22,9 @@ public class PowerManager : MonoBehaviour
     [SerializeField] AudioClip powerDownSFX;
     [SerializeField] AudioClip powerUpSFX;
 
+    [Header("Liên kết Quest (Kéo Cầu dao vào đây)")]
+    public Breaker mainBreaker; // <--- BIẾN MỚI QUAN TRỌNG
+
     public bool isPowerOff = false;
     private float currentTime; // Biến đếm thời gian thực tế
     
@@ -105,6 +108,12 @@ public class PowerManager : MonoBehaviour
         foreach (var l in mapLights) if (l != null) l.enabled = false;
 
         if (GameManager.instance) GameManager.instance.ShowHint("HỆ THỐNG SẬP! KHỞI ĐỘNG LẠI CẦU DAO.");
+
+        // ---> KÍCH HOẠT DẤU CHẤM THAN Ở ĐÂY <---
+        if (mainBreaker != null)
+        {
+            mainBreaker.ToggleMarker(true);
+        }
     }
 
     public void RestorePower()
@@ -115,10 +124,14 @@ public class PowerManager : MonoBehaviour
         if (audioSource && powerUpSFX) audioSource.PlayOneShot(powerUpSFX);
         foreach (var l in mapLights) if (l != null) l.enabled = true;
 
+        if (mainBreaker != null)
+        {
+            mainBreaker.ToggleMarker(false);
+        }
+
         // --- RESET LẠI THỜI GIAN ---
         // Từ lần thứ 2 trở đi, set thời gian là 3 phút (180s)
         currentTime = normalCycleDuration;
-        
 
         // Cập nhật ngay lập tức để người chơi thấy màu xanh lại liền
         UpdateTimerUI();
