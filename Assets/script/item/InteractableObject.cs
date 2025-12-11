@@ -51,6 +51,23 @@ public class InteractableObject : MonoBehaviour
         if (questMarker != null) questMarker.SetActive(true);
     }
 
+    public virtual void Start()
+    {
+        // Tự động tìm Marker nếu chưa kéo
+        if (questMarker == null)
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.name.Contains("Marker") || child.name.Contains("marker"))
+                {
+                    questMarker = child.gameObject;
+                    break;
+                }
+            }
+        }
+        if (questMarker != null) questMarker.SetActive(true);
+    }
+
     public virtual string GetHintText()
     {
         if (type == ObjectType.Item) return "Giữ E để nhặt " + specificItemType.ToString();
