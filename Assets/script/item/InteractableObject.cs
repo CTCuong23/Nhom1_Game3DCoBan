@@ -29,7 +29,7 @@ public class InteractableObject : MonoBehaviour
     [Header("Cài đặt cho Keypad")]
     public KeypadController keypadController; // Kéo script KeypadController vào đây
 
-    public string GetHintText()
+    public virtual string GetHintText()
     {
         if (type == ObjectType.Item) return "Giữ E để nhặt";
 
@@ -54,7 +54,7 @@ public class InteractableObject : MonoBehaviour
         return "";
     }
 
-    public void PerformAction()
+    public virtual void PerformAction()
     {
         GameManager.instance.StopLoading();
         GameManager.instance.HideHint();
