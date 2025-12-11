@@ -28,6 +28,7 @@ public class InteractableObject : MonoBehaviour
 
     [Header("Cài đặt cho Keypad")]
     public KeypadController keypadController; // Kéo script KeypadController vào đây
+    public KeypadController keypadController;
 
     public virtual void Start()
     {
