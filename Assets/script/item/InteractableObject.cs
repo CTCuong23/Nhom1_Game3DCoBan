@@ -4,11 +4,11 @@ using TMPro;
 
 public class InteractableObject : MonoBehaviour
 {
-    public enum ObjectType { Item, Door, Computer, Keypad, Locker, Pet }
+    public enum ObjectType { Item, Door, Computer, Keypad, Locker, Pet, None }
     public ObjectType type;
 
     // --- ĐỔI TÊN Ở ĐÂY: EnergyOrb -> BlueKey ---
-    public enum ItemType { None, Battery, HealthPotion, KeyCard, Chip, BlueKey }
+    public enum ItemType { None, Battery, HealthPotion, KeyCard, Chip, BlueKey, GateCard }
 
     [Header("--- QUEST MARKER ---")]
     public GameObject questMarker;
