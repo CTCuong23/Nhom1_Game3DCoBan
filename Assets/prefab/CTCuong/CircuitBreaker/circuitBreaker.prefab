@@ -66,7 +66,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: af808abc62242ef47b0db54236a40343, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4301429761327738608}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: af808abc62242ef47b0db54236a40343, type: 3}
       insertIndex: -1
@@ -78,6 +81,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2141524100141267507}
   m_SourcePrefab: {fileID: 100100000, guid: af808abc62242ef47b0db54236a40343, type: 3}
+--- !u!4 &2724006807532555630 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: af808abc62242ef47b0db54236a40343, type: 3}
+  m_PrefabInstance: {fileID: 2469983324165384837}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3352452110855247828 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: af808abc62242ef47b0db54236a40343, type: 3}
@@ -138,7 +146,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
-  questMarker: {fileID: 0}
+  questMarker: {fileID: 4217878078457816660}
   lockerScript: {fileID: 0}
   specificItemType: 0
   itemIcon: {fileID: 0}
@@ -151,3 +159,70 @@ MonoBehaviour:
   passwordContent: 1997
   isComputerOn: 0
   keypadController: {fileID: 0}
+--- !u!1001 &9214751344571783882
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2724006807532555630}
+    m_Modifications:
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 51.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5001729270631087262, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+      propertyPath: m_Name
+      value: QuestMarker_Prefab 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+--- !u!1 &4217878078457816660 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5001729270631087262, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+  m_PrefabInstance: {fileID: 9214751344571783882}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4301429761327738608 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4922680775074821178, guid: c7427e5a76ac3f04585143a0eb930a96, type: 3}
+  m_PrefabInstance: {fileID: 9214751344571783882}
+  m_PrefabAsset: {fileID: 0}

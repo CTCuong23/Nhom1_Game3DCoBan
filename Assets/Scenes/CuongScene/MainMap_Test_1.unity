@@ -33194,14 +33194,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 938886213701384947, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
-      propertyPath: m_text
-      value: "Tho\xE1t"
-      objectReference: {fileID: 0}
-    - target: {fileID: 2547046826876706943, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 55
-      objectReference: {fileID: 0}
     - target: {fileID: 3197533332487280551, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -33285,30 +33277,6 @@ PrefabInstance:
     - target: {fileID: 4032175086436351361, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
       propertyPath: m_Name
       value: Canvas3 (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 4032175086436351361, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4671941674566332488, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
-      propertyPath: m_Name
-      value: YoureDeadPanel
-      objectReference: {fileID: 0}
-    - target: {fileID: 4710855110104008648, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
-      propertyPath: m_text
-      value: "B\u1EA1n \u0110\xE3 Ch\u1EBFt"
-      objectReference: {fileID: 0}
-    - target: {fileID: 4710855110104008648, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
-      propertyPath: m_fontStyle
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5407629916435246388, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
-      propertyPath: m_text
-      value: "M\xE0n H\xECnh Ch\xEDnh "
-      objectReference: {fileID: 0}
-    - target: {fileID: 8743880547321708747, guid: 76f439915b4f54c47b5e5e5891518350, type: 3}
-      propertyPath: m_text
-      value: "Ch\u01A1i L\u1EA1i"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
