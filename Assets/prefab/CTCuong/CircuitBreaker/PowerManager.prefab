@@ -46,13 +46,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   powerTimerText: {fileID: 0}
-  firstTimeDuration: 120
-  normalCycleDuration: 180
+  firstTimeDuration: 10
+  normalCycleDuration: 15
   warningThreshold: 60
   mapLights: []
   audioSource: {fileID: 6127751735563873394}
   powerDownSFX: {fileID: 8300000, guid: 56c2c550b9f1c2b41924538dfe838cdc, type: 3}
   powerUpSFX: {fileID: 8300000, guid: d462b51e336f05a439740a103bad4541, type: 3}
+  mainBreaker: {fileID: 0}
   isPowerOff: 0
 --- !u!82 &6127751735563873394
 AudioSource:
