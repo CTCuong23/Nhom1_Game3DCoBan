@@ -4,8 +4,8 @@ using UnityEngine.UI;
 
 public class CameraZoom : MonoBehaviour
 {
-    [Header("Highlight Settings (Vật liệu phát sáng)")]
-    [SerializeField] Material highlightMaterial; // Kéo Material EdgeGlow vào đây
+    [Header("Highlight Settings")]
+    [SerializeField] Material highlightMaterial;
     private InteractableObject currentHighlightObj;
     private Material originalMaterial;
     private Renderer currentRenderer;
@@ -14,15 +14,13 @@ public class CameraZoom : MonoBehaviour
     [SerializeField] CinemachineVirtualCamera vCam;
     [SerializeField] Camera mainCamera;
 
-    [Header("UI Crosshair (Tâm thường)")]
+    [Header("UI Crosshair")]
     [SerializeField] Image centerCrosshair;
     [SerializeField] Image centerCrosshairHover;
-
-    [Header("UI Hand Cursor (Bàn tay Tâm ngắm)")]
     [SerializeField] Image handCursor;
     [SerializeField] Image handHover;
 
-    [Header("Interaction (Tương tác)")]
+    [Header("Interaction")]
     private float interactionDistance = 5f;
     [SerializeField] LayerMask interactableLayer;
     private float interactionRadius = 0.07f;
@@ -40,7 +38,6 @@ public class CameraZoom : MonoBehaviour
     [Range(0.1f, 1f)] private float mouseSensitivityMultiplier = 0.2f;
     public static float CurrentSensitivityFactor = 1f;
 
-    // Private variables
     private float defaultFOV;
     private float defaultDistance;
     private Vector3 defaultOffset;
@@ -62,7 +59,6 @@ public class CameraZoom : MonoBehaviour
             defaultOffset = thirdPersonComponent.ShoulderOffset;
             defaultDamping = thirdPersonComponent.Damping;
         }
-
         UpdateCrosshairVisuals();
     }
 
@@ -70,25 +66,22 @@ public class CameraZoom : MonoBehaviour
     {
         if (vCam == null || thirdPersonComponent == null) return;
 
-        // 1. INPUT BẬT/TẮT ZOOM (Phím Q)
+        // 1. INPUT ZOOM (Phím Q)
         if (Input.GetKeyDown(KeyCode.Q))
         {
             isZooming = !isZooming;
             GameManager.instance.isAiming = !GameManager.instance.isAiming;
-
-            // Nếu tắt ngắm thì reset mọi thứ
             if (!isZooming) ResetInteraction();
-
             UpdateCrosshairVisuals();
         }
 
-        // 2. LOGIC TƯƠNG TÁC (Chỉ chạy khi đang Zoom)
+        // 2. TƯƠNG TÁC KHI ZOOM
         if (isZooming)
         {
             HandleCenterInteraction();
         }
 
-        // 3. ZOOM PHYSICS (Luôn chạy để camera mượt)
+        // 3. ZOOM PHYSICS
         ApplyZoomPhysics();
     }
 
@@ -96,19 +89,17 @@ public class CameraZoom : MonoBehaviour
     {
         if (isZooming)
         {
-            // Đang ngắm: Tắt tâm thường, Bật tâm bàn tay
-            if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(false);
-            if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(true); // Cái này là tâm xanh nhỏ
-            if (handCursor != null) handCursor.gameObject.SetActive(true);
-            if (handHover != null) handHover.gameObject.SetActive(false);
+            if (centerCrosshair) centerCrosshair.gameObject.SetActive(false);
+            if (centerCrosshairHover) centerCrosshairHover.gameObject.SetActive(true);
+            if (handCursor) handCursor.gameObject.SetActive(true);
+            if (handHover) handHover.gameObject.SetActive(false);
         }
         else
         {
-            // Không ngắm: Bật tâm thường
-            if (centerCrosshair != null) centerCrosshair.gameObject.SetActive(true);
-            if (centerCrosshairHover != null) centerCrosshairHover.gameObject.SetActive(false);
-            if (handCursor != null) handCursor.gameObject.SetActive(false);
-            if (handHover != null) handHover.gameObject.SetActive(false);
+            if (centerCrosshair) centerCrosshair.gameObject.SetActive(true);
+            if (centerCrosshairHover) centerCrosshairHover.gameObject.SetActive(false);
+            if (handCursor) handCursor.gameObject.SetActive(false);
+            if (handHover) handHover.gameObject.SetActive(false);
         }
     }
 
@@ -117,39 +108,34 @@ public class CameraZoom : MonoBehaviour
         Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
-        // Bắn tia từ giữa màn hình
         if (Physics.SphereCast(ray, interactionRadius, out hit, interactionDistance, interactableLayer))
         {
             InteractableObject obj = hit.collider.GetComponent<InteractableObject>();
 
-            // === QUAN TRỌNG: CHỈ XỬ LÝ NẾU LÀ ITEM (VẬT PHẨM) ===
-            // Nếu là Cửa (Door) thì bỏ qua, để cho script PlayerInteraction lo
+            // CHỈ XỬ LÝ NẾU LÀ ITEM (Bao gồm Pin, Thẻ, và BLUE KEY)
             if (obj != null && obj.type == InteractableObject.ObjectType.Item)
             {
-                // 1. XỬ LÝ HIGHLIGHT (Phát sáng)
+                // Highlight
                 if (obj != currentHighlightObj)
                 {
-                    ResetHighlightEffect(); // Tắt sáng cái cũ
-
-                    // Gán cái mới và bật sáng
+                    ResetHighlightEffect();
                     currentHighlightObj = obj;
                     currentRenderer = obj.GetComponent<Renderer>();
-
                     if (currentRenderer != null && highlightMaterial != null)
                     {
-                        originalMaterial = currentRenderer.material; // Lưu áo cũ
-                        currentRenderer.material = highlightMaterial; // Mặc áo mới
+                        originalMaterial = currentRenderer.material;
+                        currentRenderer.material = highlightMaterial;
                     }
                 }
 
-                // 2. XỬ LÝ UI BÀN TAY (Nắm lại)
-                if (handCursor != null) handCursor.gameObject.SetActive(false);
-                if (handHover != null) handHover.gameObject.SetActive(true);
+                // UI Bàn tay
+                if (handCursor) handCursor.gameObject.SetActive(false);
+                if (handHover) handHover.gameObject.SetActive(true);
 
-                // 3. HIỆN GỢI Ý
+                // Gợi ý
                 GameManager.instance.ShowHint(obj.GetHintText());
 
-                // 4. XỬ LÝ GIỮ PHÍM E
+                // Giữ E
                 if (Input.GetKey(KeyCode.E))
                 {
                     currentHoldTime += Time.deltaTime;
@@ -157,52 +143,47 @@ public class CameraZoom : MonoBehaviour
 
                     if (currentHoldTime >= obj.holdTime)
                     {
-                        obj.PerformAction(); // Nhặt đồ
-                        ResetInteraction();  // Reset sau khi nhặt
+                        obj.PerformAction();
+                        ResetInteraction(); // Reset ngay lập tức
                     }
                 }
                 else
                 {
-                    // Thả tay ra thì reset thanh loading
                     if (currentHoldTime > 0)
                     {
                         currentHoldTime = 0f;
                         GameManager.instance.StopLoading();
                     }
                 }
-
-                return; // Kết thúc hàm tại đây (đã tìm thấy Item)
+                return;
             }
         }
 
-        // === NẾU KHÔNG NGẮM TRÚNG ITEM NÀO ===
         ResetInteraction();
     }
 
-    // Hàm dọn dẹp trạng thái
     void ResetInteraction()
     {
-        // Trả lại UI Bàn tay mở
         if (handCursor != null && isZooming) handCursor.gameObject.SetActive(true);
         if (handHover != null) handHover.gameObject.SetActive(false);
 
-        // Tắt chữ gợi ý và Loading
-        GameManager.instance.HideHint();
-        GameManager.instance.StopLoading();
-        currentHoldTime = 0f;
+        // Đảm bảo tắt Loading UI
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.HideHint();
+            GameManager.instance.StopLoading();
+        }
 
-        // Tắt hiệu ứng sáng
+        currentHoldTime = 0f;
         ResetHighlightEffect();
     }
 
     void ResetHighlightEffect()
     {
-        if (currentHighlightObj != null && currentRenderer != null)
+        if (currentHighlightObj != null && currentRenderer != null && originalMaterial != null)
         {
-            // Trả lại material gốc
             currentRenderer.material = originalMaterial;
         }
-
         currentHighlightObj = null;
         currentRenderer = null;
         originalMaterial = null;
@@ -212,7 +193,6 @@ public class CameraZoom : MonoBehaviour
     {
         float dt = Time.deltaTime * smoothSpeed;
         float targetFOV = isZooming ? zoomFOV : defaultFOV;
-
         CurrentSensitivityFactor = isZooming ? mouseSensitivityMultiplier : 1f;
 
         vCam.m_Lens.FieldOfView = Mathf.Lerp(vCam.m_Lens.FieldOfView, targetFOV, dt);

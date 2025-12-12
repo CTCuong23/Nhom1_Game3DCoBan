@@ -33,33 +33,34 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
-        // Kiểm tra an toàn
-        if (currentTriggerObj == null || GameManager.instance.isUsingKeypad) return;
+        // --- FIX LỖI LOADING KẸT KHI OBJECT BIẾN MẤT ---
+        if (currentTriggerObj == null)
+        {
+            // Nếu đang hold mà object mất tiêu -> Reset ngay
+            if (currentHoldTime > 0) ResetInteraction();
+            return;
+        }
+        // -----------------------------------------------
+
+        if (GameManager.instance.isUsingKeypad) return;
 
         InteractableObject obj = currentTriggerObj;
 
-        // --- ƯU TIÊN 1: PHÍM F (Keypad & Tủ) ---
+        // Ưu tiên 1: Phím F (Keypad, Tủ)
         if (obj.type == InteractableObject.ObjectType.Keypad || obj.type == InteractableObject.ObjectType.Locker)
         {
             GameManager.instance.ShowHint(obj.GetHintText());
-
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                obj.PerformAction();
-            }
-            return; // Xong việc, không chạy phần dưới
+            if (Input.GetKeyDown(KeyCode.F)) obj.PerformAction();
+            return;
         }
 
-        // --- ƯU TIÊN 2: PHÍM E (Nhặt đồ, Cửa, Máy tính) ---
+        // Ưu tiên 2: Phím E
+        // --- CHÚ Ý: ĐÃ XÓA LOGIC NHẶT ITEM Ở ĐÂY ĐỂ DÀNH CHO CAMERA ZOOM ---
 
-        // Kiểm tra điều kiện Máy tính
+        // Kiểm tra Máy tính
         if (obj.type == InteractableObject.ObjectType.Computer)
         {
-            if (obj.isComputerOn)
-            {
-                GameManager.instance.HideHint();
-                return;
-            }
+            if (obj.isComputerOn) { GameManager.instance.HideHint(); return; }
             if (!GameManager.instance.IsHoldingItem(InteractableObject.ItemType.Battery))
             {
                 GameManager.instance.ShowHint(obj.GetHintText());
@@ -67,17 +68,24 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        // Kiểm tra điều kiện Cửa
+        // Kiểm tra Cửa
         if (obj.type == InteractableObject.ObjectType.Door && GameManager.instance.collectedKeyCards < 10)
         {
             GameManager.instance.ShowHint(obj.GetHintText());
             return;
         }
 
+        // Kiểm tra Pet
+        if (obj.type == InteractableObject.ObjectType.Pet)
+        {
+            // Nếu đã thuần phục thì thôi
+            if (obj.petScript != null && obj.petScript.isTamed) return;
+        }
+
         // Hiện gợi ý chung
         GameManager.instance.ShowHint(obj.GetHintText());
 
-        // Xử lý Giữ Phím E (ĐÃ KHÔI PHỤC)
+        // Xử lý giữ E (Cho Cửa, Máy tính, Pet)
         if (Input.GetKey(KeyCode.E))
         {
             currentHoldTime += Time.deltaTime;
@@ -87,6 +95,8 @@ public class PlayerInteraction : MonoBehaviour
             {
                 obj.PerformAction();
                 ResetInteraction();
+                // Vì Pet hoặc Item có thể bị destroy hoặc disable sau action, nên ta set null luôn cho an toàn
+                currentTriggerObj = null;
             }
         }
         else
@@ -101,8 +111,11 @@ public class PlayerInteraction : MonoBehaviour
 
     void ResetInteraction()
     {
-        GameManager.instance.HideHint();
-        GameManager.instance.StopLoading();
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.HideHint();
+            GameManager.instance.StopLoading();
+        }
         currentHoldTime = 0f;
     }
 }

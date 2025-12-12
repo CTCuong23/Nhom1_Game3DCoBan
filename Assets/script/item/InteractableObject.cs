@@ -4,10 +4,11 @@ using TMPro;
 
 public class InteractableObject : MonoBehaviour
 {
-    public enum ObjectType { Item, Door, Computer, Keypad, Locker }
+    public enum ObjectType { Item, Door, Computer, Keypad, Locker, Pet }
     public ObjectType type;
 
-    public enum ItemType { None, Battery, HealthPotion, KeyCard, Chip }
+    // --- ĐỔI TÊN Ở ĐÂY: EnergyOrb -> BlueKey ---
+    public enum ItemType { None, Battery, HealthPotion, KeyCard, Chip, BlueKey }
 
     [Header("--- QUEST MARKER ---")]
     public GameObject questMarker;
@@ -15,31 +16,26 @@ public class InteractableObject : MonoBehaviour
     [Header("Cài đặt Tủ Trốn")]
     public HidingLocker lockerScript;
 
+    [Header("Cài đặt Pet")]
+    public PetController petScript;
+
     [Header("Loại vật phẩm")]
     public ItemType specificItemType;
     public Sprite itemIcon;
     public float holdTime = 2f;
 
-    [Header("Cài đặt cho Cửa")]
+    [Header("Cài đặt khác")]
     public Animator doorAnimator;
     public Collider doorBlockCollider;
     public PlayableDirector timelineDirector;
-
-    [Header("Cài đặt cho Máy Tính")]
     public GameObject screenCanvas;
     public TextMeshProUGUI passwordText;
     public string passwordContent = "1997";
     public bool isComputerOn = false;
-
-    [Header("Cài đặt cho Keypad")]
-
-
     public KeypadController keypadController;
-
 
     public virtual void Start()
     {
-        // Tự động tìm Marker nếu chưa kéo
         if (questMarker == null)
         {
             foreach (Transform child in transform)
@@ -57,6 +53,19 @@ public class InteractableObject : MonoBehaviour
     public virtual string GetHintText()
     {
         if (type == ObjectType.Item) return "Giữ E để nhặt " + specificItemType.ToString();
+
+        // --- GỢI Ý CHO PET (Dùng BlueKey) ---
+        if (type == ObjectType.Pet)
+        {
+            if (petScript != null && petScript.isTamed) return "";
+
+            // Kiểm tra BlueKey thay vì EnergyOrb
+            if (GameManager.instance.IsHoldingItem(ItemType.BlueKey))
+                return "Giữ E để Thuần Phục";
+            else
+                return "Cần Chìa Khóa Xanh (Blue Key)";
+        }
+        // ------------------------------------
 
         if (type == ObjectType.Locker) return "Nhấn F để trốn";
 
@@ -80,49 +89,64 @@ public class InteractableObject : MonoBehaviour
 
     public virtual void PerformAction()
     {
-        GameManager.instance.StopLoading();
-        GameManager.instance.HideHint();
+        // --- FIX LỖI LOADING KHÔNG MẤT: Tắt ngay lập tức ---
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.StopLoading();
+            GameManager.instance.HideHint();
+        }
+        // --------------------------------------------------
 
-        // 1. XỬ LÝ TỦ (MỚI)
-        if (type == ObjectType.Locker)
+        // 1. XỬ LÝ PET
+        if (type == ObjectType.Pet)
+        {
+            if (GameManager.instance.IsHoldingItem(ItemType.BlueKey)) // Check BlueKey
+            {
+                if (petScript != null)
+                {
+                    petScript.TamePet();
+                    GameManager.instance.RemoveCurrentItem();
+
+                    Collider col = GetComponent<Collider>();
+                    if (col != null) col.enabled = false;
+
+                    if (questMarker != null) Destroy(questMarker);
+
+                    GameManager.instance.ShowHint("Đã thu phục Pet!");
+                    this.enabled = false;
+                }
+            }
+            else
+            {
+                GameManager.instance.ShowHint("Cần trang bị Chìa Khóa Xanh!");
+            }
+        }
+
+        // 2. XỬ LÝ TỦ
+        else if (type == ObjectType.Locker)
         {
             if (lockerScript != null) lockerScript.EnterLocker();
         }
 
-        // 2. XỬ LÝ ITEM (ĐÃ KHÔI PHỤC)
+        // 3. XỬ LÝ ITEM (Nhặt đồ)
         else if (type == ObjectType.Item)
         {
             bool success = false;
-
             if (specificItemType == ItemType.KeyCard || specificItemType == ItemType.Chip)
             {
-                // Item cốt truyện (Thẻ) -> Nhặt luôn
-                if (specificItemType == ItemType.KeyCard)
-                {
-                    GameManager.instance.CollectKeyCard(transform.position);
-                }
+                if (specificItemType == ItemType.KeyCard) GameManager.instance.CollectKeyCard(transform.position);
                 success = true;
             }
             else
             {
-                // Item dùng được (Pin, Máu) -> Vào Hotbar
-                if (GameManager.instance.AddItemToHotbar(specificItemType, itemIcon))
-                {
-                    success = true;
-                }
-                else
-                {
-                    GameManager.instance.ShowHint("Túi đồ đã đầy!");
-                }
+                if (GameManager.instance.AddItemToHotbar(specificItemType, itemIcon)) success = true;
+                else GameManager.instance.ShowHint("Túi đồ đã đầy!");
             }
 
-            if (success)
-            {
-                Destroy(gameObject); // Xóa vật phẩm (Marker con sẽ tự mất theo)
-            }
+            if (success) Destroy(gameObject);
         }
 
-        // 3. XỬ LÝ MÁY TÍNH
+        // 4. XỬ LÝ MÁY TÍNH
         else if (type == ObjectType.Computer)
         {
             if (GameManager.instance.IsHoldingItem(ItemType.Battery))
@@ -130,14 +154,12 @@ public class InteractableObject : MonoBehaviour
                 isComputerOn = true;
                 if (screenCanvas != null) screenCanvas.SetActive(true);
                 if (passwordText != null) passwordText.text = "PASSWORD\n" + passwordContent;
-
                 GameManager.instance.RemoveCurrentItem();
-
                 if (questMarker != null) Destroy(questMarker);
             }
         }
 
-        // 4. XỬ LÝ CỬA
+        // 5. XỬ LÝ CỬA
         else if (type == ObjectType.Door)
         {
             if (GameManager.instance.collectedKeyCards >= 10)
@@ -149,7 +171,7 @@ public class InteractableObject : MonoBehaviour
             }
         }
 
-        // 5. XỬ LÝ KEYPAD
+        // 6. XỬ LÝ KEYPAD
         else if (type == ObjectType.Keypad)
         {
             if (keypadController != null) keypadController.ActivateKeypad();
