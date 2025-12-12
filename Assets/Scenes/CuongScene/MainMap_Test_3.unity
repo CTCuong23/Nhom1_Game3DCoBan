@@ -39992,11 +39992,11 @@ PrefabInstance:
       objectReference: {fileID: 774840954}
     - target: {fileID: 8700669673776357714, guid: 7d6451059caeb7b469c69e46d9fae319, type: 3}
       propertyPath: firstTimeDuration
-      value: 180
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8700669673776357714, guid: 7d6451059caeb7b469c69e46d9fae319, type: 3}
       propertyPath: normalCycleDuration
-      value: 300
+      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
