@@ -7,12 +7,12 @@ public class PowerManager : MonoBehaviour
     public static PowerManager instance;
 
     [Header("UI Hiển thị")]
-    [SerializeField] TextMeshProUGUI powerTimerText; // Kéo cái Text trên màn hình vào đây
+    [SerializeField] TextMeshProUGUI powerTimerText; 
 
     [Header("Cài đặt Thời gian (Giây)")]
-    [SerializeField] float firstTimeDuration = 60f;   // Lần đầu: 1 phút (60s)
-    [SerializeField] float normalCycleDuration = 180f; // Các lần sau: 3 phút (180s)
-    [SerializeField] float warningThreshold = 60f;     // Cảnh báo đỏ khi còn 1 phút
+    [SerializeField] float firstTimeDuration = 60f;   
+    [SerializeField] float normalCycleDuration = 180f; 
+    [SerializeField] float warningThreshold = 60f;     
 
     [Header("Danh sách đèn (Tự tìm)")]
     [SerializeField] List<Light> mapLights = new List<Light>();
@@ -23,7 +23,7 @@ public class PowerManager : MonoBehaviour
     [SerializeField] AudioClip powerUpSFX;
 
     [Header("Liên kết Quest (Kéo Cầu dao vào đây)")]
-    public Breaker mainBreaker; // <--- BIẾN MỚI QUAN TRỌNG
+    public Breaker mainBreaker; 
 
     public bool isPowerOff = false;
     private float currentTime; // Biến đếm thời gian thực tế

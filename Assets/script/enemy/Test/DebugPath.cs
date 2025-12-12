@@ -3,8 +3,8 @@ using UnityEngine.AI;
 
 public class DebugPath : MonoBehaviour
 {
-    NavMeshAgent agent;
-    LineRenderer line;
+    private NavMeshAgent agent;
+    private LineRenderer line;
 
     void Start()
     {

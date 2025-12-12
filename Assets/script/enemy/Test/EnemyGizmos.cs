@@ -3,11 +3,11 @@
 public class EnemyGizmos : MonoBehaviour
 {
     [Header("Cài đặt thông số để nhìn thử (Không ảnh hưởng logic thật)")]
-    public float wanderRadius = 10f; // Nhập số giống hệt trong Blackboard
-    public float detectRange = 5f;   // Nhập số giống DetectRange
+    [SerializeField] float wanderRadius = 10f; // Nhập số giống hệt trong Blackboard
+    [SerializeField] float detectRange = 5f;   // Nhập số giống DetectRange
 
-    public Color wanderColor = Color.yellow;
-    public Color detectColor = Color.red;
+    [SerializeField] Color wanderColor = Color.yellow;
+    [SerializeField] Color detectColor = Color.red;
 
     // OnDrawGizmosSelected chỉ vẽ khi bạn Click chọn vào con Enemy (đỡ rối mắt)
     private void OnDrawGizmosSelected()

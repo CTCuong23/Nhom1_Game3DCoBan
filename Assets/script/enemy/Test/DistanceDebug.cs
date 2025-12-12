@@ -2,8 +2,8 @@
 
 public class DistanceDebug : MonoBehaviour
 {
-    public Transform targetPlayer;
-    public float detectRange = 15f;
+    [SerializeField] Transform targetPlayer;
+    [SerializeField] float detectRange = 15f;
 
     void Start()
     {

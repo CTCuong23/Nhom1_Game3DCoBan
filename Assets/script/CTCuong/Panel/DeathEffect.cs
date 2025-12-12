@@ -4,35 +4,35 @@ using System.Collections;
 
 public class DeathEffect : MonoBehaviour
 {
-    public Image tamHinhMau;
-    public float tocDoChay = 0.5f;
+    [SerializeField] Image BloodImage;
+    [SerializeField] float FlowSpeed = 0.5f;
 
     private void OnEnable()
     {
-        if (tamHinhMau != null)
+        if (BloodImage != null)
         {
             // Reset về 0 ngay khi bảng hiện lên
-            tamHinhMau.fillAmount = 0f;
-            tamHinhMau.gameObject.SetActive(true);
+            BloodImage.fillAmount = 0f;
+            BloodImage.gameObject.SetActive(true);
 
-            StartCoroutine(HieuUngChayMau());
+            StartCoroutine(BleedingEffect());
         }
     }
 
-    IEnumerator HieuUngChayMau()
+    IEnumerator BleedingEffect()
     {
-        float giaTriHienTai = 0f;
+        float CurrentValue = 0f;
 
-        while (giaTriHienTai < 1f)
+        while (CurrentValue < 1f)
         {
             // --- SỬA Ở ĐÂY: Dùng unscaledDeltaTime thay vì deltaTime ---
             // Để dù game có Pause (TimeScale = 0) thì máu vẫn chảy
-            giaTriHienTai += Time.unscaledDeltaTime * tocDoChay;
+            CurrentValue += Time.unscaledDeltaTime * FlowSpeed;
 
-            tamHinhMau.fillAmount = giaTriHienTai;
+            BloodImage.fillAmount = CurrentValue;
             yield return null;
         }
 
-        tamHinhMau.fillAmount = 1f;
+        BloodImage.fillAmount = 1f;
     }
 }

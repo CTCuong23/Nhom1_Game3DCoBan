@@ -9,7 +9,7 @@ using Unity.Properties;
 [NodeDescription(name: "Move To Patrol Waypoint", story: "Pick random waypoint and move", category: "Action/Navigation", id: "MoveToWaypoint")]
 public partial class MoveToWaypointAction : Action
 {
-    [SerializeReference] public BlackboardVariable<float> Speed;
+    [SerializeReference][SerializeField] BlackboardVariable<float> Speed;
 
     protected override Status OnStart()
     {

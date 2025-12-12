@@ -9,9 +9,9 @@ using Unity.Properties;
 [NodeDescription(name: "Chase Player (Throttled)", story: "Chase Player with delay", category: "Action/Navigation", id: "ChasePlayerFinal")]
 public partial class MoveToPlayerAction : Action
 {
-    [SerializeReference] public BlackboardVariable<GameObject> TargetPlayer;
-    [SerializeReference] public BlackboardVariable<float> Speed;
-    [SerializeReference] public BlackboardVariable<float> StopChaseDistance;
+    [SerializeReference][SerializeField] BlackboardVariable<GameObject> TargetPlayer;
+    [SerializeReference][SerializeField] BlackboardVariable<float> Speed;
+    [SerializeReference][SerializeField] BlackboardVariable<float> StopChaseDistance;
 
     private NavMeshAgent agent;
 
@@ -20,20 +20,12 @@ public partial class MoveToPlayerAction : Action
     // Biến kiểm tra để đảm bảo Start/Stop luôn đi theo cặp
     private bool hasStartedChase = false;
 
-    
-
-
     protected override Status OnStart()
     {
         if (TargetPlayer.Value == null) return Status.Failure;
         agent = GameObject.GetComponent<NavMeshAgent>();
         if (agent == null) return Status.Failure;
 
-
-        
-
-
-        
 
         // Nếu Player đang trốn -> Thất bại ngay (Để quái chuyển sang hành động khác)
         if (GameManager.instance.isPlayerHiding) return Status.Failure;
