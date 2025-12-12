@@ -2,7 +2,7 @@
 
 public class ScaryLight : MonoBehaviour
 {
-    Light myLight;
+    private Light myLight;
     [SerializeField] float minIntensity = 2f; // Độ sáng thấp nhất
     [SerializeField] float maxIntensity = 5f; // Độ sáng cao nhất
     [SerializeField] float speed = 2f;        // Tốc độ nhấp nháy

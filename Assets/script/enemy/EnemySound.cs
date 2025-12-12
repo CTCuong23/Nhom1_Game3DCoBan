@@ -9,11 +9,11 @@ public class EnemySound : MonoBehaviour
     [SerializeField] AudioClip alertSound;
 
     [Header("Âm thanh Tấn công")]
-    [SerializeField] AudioClip attackSound; // Kéo tiếng vung tay/gầm gừ vào đây
+    [SerializeField] AudioClip attackSound; 
 
     // --- BIẾN MỚI: Dùng để đếm giờ ---
     private float lastAlertTime = -100f; // Mốc thời gian lần cuối kêu
-    public float alertCooldown = 5f;     // Cứ 5 giây mới được kêu 1 lần
+    [SerializeField] float alertCooldown = 5f;     // Cứ 5 giây mới được kêu 1 lần
 
     private void Start()
     {
