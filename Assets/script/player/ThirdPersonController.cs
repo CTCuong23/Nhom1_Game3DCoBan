@@ -59,6 +59,9 @@ namespace StarterAssets
         [Tooltip("What layers the character uses as ground")]
         public LayerMask GroundLayers;
 
+        [SerializeField] private LayerMask platformLayer;
+        private Transform currentPlatform = null;
+
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
         public GameObject CinemachineCameraTarget;
@@ -160,6 +163,7 @@ namespace StarterAssets
             JumpAndGravity();
             GroundedCheck();
             Move();
+            CheckMovingPlatform(); // <-- thêm dòng này
         }
 
         private void LateUpdate()
@@ -403,5 +407,44 @@ namespace StarterAssets
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
         }
+        private void CheckMovingPlatform()
+        {
+            // Bắn 1 raycast từ player xuống dưới để kiểm tra mặt đất
+            // Tăng độ dài ray lên một chút (1.5f là ổn) và thêm offset để bắn từ giữa người
+            Ray ray = new Ray(transform.position + Vector3.up * 0.5f, Vector3.down);
+            RaycastHit hit;
+
+            // Debug.DrawRay(transform.position + Vector3.up * 0.5f, Vector3.down * 2f, Color.red); // Bật lên nếu muốn test tia ray
+
+            // Nếu ray chạm platform (nhớ set Layer MovingPlatform cho cả object Cha và Con nhé)
+            if (Physics.Raycast(ray, out hit, 2f, platformLayer))
+            {
+                // Thay vì lấy hit.collider.transform (là cái Box con bị méo)
+                // Ta tìm xem object này (hoặc cha nó) có script MovingPlatform3D không
+                MovingPlatform3D platformScript = hit.collider.GetComponentInParent<MovingPlatform3D>();
+
+                if (platformScript != null)
+                {
+                    // Tìm thấy script di chuyển -> Bám vào object chứa script đó (cái Root chuẩn 1,1,1)
+                    Transform validPlatformRoot = platformScript.transform;
+
+                    if (currentPlatform != validPlatformRoot)
+                    {
+                        currentPlatform = validPlatformRoot;
+                        transform.SetParent(currentPlatform);
+                    }
+                }
+            }
+            else
+            {
+                // Nếu Player bước ra khỏi vùng raycast hoặc nhảy lên
+                if (currentPlatform != null)
+                {
+                    transform.SetParent(null);
+                    currentPlatform = null;
+                }
+            }
+        }
+
     }
 }
