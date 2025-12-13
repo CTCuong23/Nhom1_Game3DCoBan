@@ -9,9 +9,9 @@ using Unity.Properties;
 [NodeDescription(name: "Chase Player (Throttled)", story: "Chase Player with delay", category: "Action/Navigation", id: "ChasePlayerFinal")]
 public partial class MoveToPlayerAction : Action
 {
-    [SerializeReference][SerializeField] BlackboardVariable<GameObject> TargetPlayer;
-    [SerializeReference][SerializeField] BlackboardVariable<float> Speed;
-    [SerializeReference][SerializeField] BlackboardVariable<float> StopChaseDistance;
+    [SerializeReference]public BlackboardVariable<GameObject> TargetPlayer;
+    [SerializeReference]public BlackboardVariable<float> Speed;
+    [SerializeReference]public BlackboardVariable<float> StopChaseDistance;
 
     private NavMeshAgent agent;
 
