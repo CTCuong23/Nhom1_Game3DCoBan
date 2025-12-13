@@ -82,7 +82,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    void Die()
+    public void Die()
     {
         currentHealth = 0;
         Debug.Log("Player Dead!");
@@ -119,4 +119,15 @@ public class PlayerStats : MonoBehaviour
         if (currentHealth > maxHealth) currentHealth = maxHealth;
         UpdateUI();
     }
+    //public void KillPlayerImmediate()
+    //{
+    //    // Đảm bảo máu về 0
+    //    currentHealth = 0f;
+
+    //    // Gọi hàm xử lý cái chết
+    //    Die();
+
+    //    // Cập nhật UI ngay lập tức
+    //    UpdateUI();
+    //}
 }
