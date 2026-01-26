@@ -7,17 +7,26 @@ public class BossLaserSkill : MonoBehaviour
     public GameObject warningZonePrefab;
     public GameObject laserPrefab;
 
-    [Header("--- Cài đặt Tấn Công ---")]
-    public float warningDuration = 2.0f;
-    public float maxWarningSize = 5.0f;
-    public float laserDuration = 1.0f;
-    public float laserSpawnHeight = 10.0f;
+    [Header("--- Cài đặt Thời Gian ---")]
+    public float skillActiveDuration = 10.0f; // Tổng thời gian skill hoạt động (Boss gồng trong 10s)
+    public float waveInterval = 2.0f;         // Cứ 2s bắn 1 đợt
+    public float skillCooldown = 20.0f;       // Hồi chiêu sau khi xong hết
 
-    [Tooltip("Độ cao của vòng tròn đỏ so với mặt đất (Chỉnh cao lên nếu bị khuất)")]
-    public float warningHeight = 0.5f; // <--- MỚI THÊM: Mặc định là 0.5
+    [Header("--- Cài đặt Chi tiết đợt bắn ---")]
+    public int lasersPerWave = 10;            // Số lượng tia (và số vùng cảnh báo) mỗi đợt
+    public float warningDuration = 1.5f;      // Thời gian vòng đỏ cảnh báo to dần trước khi bắn
+    public float laserLifeTime = 1.0f;        // Laze tồn tại bao lâu rồi tắt
 
-    [Header("--- Mục tiêu ---")]
-    public Transform playerTarget;
+    [Header("--- Cài đặt Khu Vực ---")]
+    public float warningSize = 1.5f;          // Kích thước của MỖI vòng cảnh báo nhỏ
+    public float laserSpawnHeight = 10.0f;    // Độ cao laze
+    public float warningHeight = 0.5f;
+
+    [Header("--- Phạm Vi Ngẫu Nhiên (Map) ---")]
+    public float minX = -10f;
+    public float maxX = 10f;
+    public float minZ = -10f;
+    public float maxZ = 10f;
 
     private Vector3 initialWarningScale;
 
@@ -27,54 +36,90 @@ public class BossLaserSkill : MonoBehaviour
         {
             initialWarningScale = warningZonePrefab.transform.localScale;
         }
+
+        Debug.Log("[BossSkill] Start: Hệ thống Boss đa điểm sẵn sàng.");
+        StartCoroutine(AutoSkillLoop());
     }
 
-    void Update()
+    // Vòng lặp chính quản lý trạng thái Boss (Bắn -> Nghỉ -> Bắn)
+    IEnumerator AutoSkillLoop()
     {
-        // Phím T để test
-        if (Input.GetKeyDown(KeyCode.I))
+        while (true)
         {
-            Vector3 targetPos = playerTarget != null ? playerTarget.position : Vector3.zero;
-            CastSkill(targetPos);
+            Debug.Log("[BossSkill] --- BẮT ĐẦU TRẠNG THÁI CUỒNG NỘ (10s) ---");
+
+            float activeTimer = 0f;
+
+            // Trong 10 giây này, cứ mỗi waveInterval (2s) sẽ gọi lệnh bắn 1 lần
+            while (activeTimer < skillActiveDuration)
+            {
+                Debug.Log($"[BossSkill] >>> Kích hoạt đợt tấn công tại giây thứ {activeTimer}: Rải {lasersPerWave} điểm nổ.");
+
+                // Gọi hàm bắn 1 đợt (Hàm này sẽ tự xử lý việc sinh ra 10 điểm riêng biệt)
+                SpawnMultiShotWave();
+
+                // Chờ đến đợt tiếp theo
+                yield return new WaitForSeconds(waveInterval);
+                activeTimer += waveInterval;
+            }
+
+            Debug.Log($"[BossSkill] Hết thời gian cuồng nộ. Đang hồi chiêu... ({skillCooldown}s)");
+            yield return new WaitForSeconds(skillCooldown);
         }
     }
 
-    public void CastSkill(Vector3 targetPosition)
+    // Hàm sinh ra 1 đợt gồm nhiều tia riêng biệt
+    void SpawnMultiShotWave()
     {
-        // --- SỬA Ở ĐÂY: Dùng biến warningHeight thay vì số cứng 0.05f ---
-        Vector3 groundPosition = new Vector3(targetPosition.x, warningHeight, targetPosition.z);
+        for (int i = 0; i < lasersPerWave; i++)
+        {
+            // 1. Chọn vị trí ngẫu nhiên cho tia này
+            float rX = Random.Range(minX, maxX);
+            float rZ = Random.Range(minZ, maxZ);
+            Vector3 targetPos = new Vector3(rX, warningHeight, rZ);
 
-        StartCoroutine(ExecuteAttackSequence(groundPosition));
+            // 2. Chạy quy trình (Cảnh báo -> Bắn) cho riêng vị trí này
+            // Dùng StartCoroutine ở đây để 10 tia chạy song song nhau cùng lúc
+            StartCoroutine(ProcessSingleStrike(targetPos));
+        }
     }
 
-    IEnumerator ExecuteAttackSequence(Vector3 position)
+    // Quy trình xử lý cho MỘT tia laze duy nhất (Warning -> Laser)
+    IEnumerator ProcessSingleStrike(Vector3 position)
     {
-        // Tạo vùng cảnh báo
-        GameObject currentWarning = Instantiate(warningZonePrefab, position, Quaternion.identity);
-        currentWarning.transform.localScale = new Vector3(0, initialWarningScale.y, 0);
+        // --- GIAI ĐOẠN 1: CẢNH BÁO TẠI ĐIỂM NÀY ---
+        GameObject warnObj = Instantiate(warningZonePrefab, position, Quaternion.identity);
+
+        // Reset scale về 0 để hiệu ứng phình to
+        warnObj.transform.localScale = new Vector3(0, initialWarningScale.y, 0);
 
         float timer = 0f;
-
-        // Vòng lặp to dần
         while (timer < warningDuration)
         {
             timer += Time.deltaTime;
             float progress = timer / warningDuration;
-            float currentSize = Mathf.Lerp(0, maxWarningSize, progress);
-            currentWarning.transform.localScale = new Vector3(currentSize, initialWarningScale.y, currentSize);
+            // Lerp từ 0 lên kích thước warningSize (nhỏ)
+            float currentSize = Mathf.Lerp(0, warningSize, progress);
+            warnObj.transform.localScale = new Vector3(currentSize, initialWarningScale.y, currentSize);
             yield return null;
         }
 
-        currentWarning.transform.localScale = new Vector3(maxWarningSize, initialWarningScale.y, maxWarningSize);
+        // Đảm bảo kích thước cuối cùng chuẩn xác
+        warnObj.transform.localScale = new Vector3(warningSize, initialWarningScale.y, warningSize);
+
+        // Chờ xíu xiu sau khi vòng đỏ đầy rồi mới bắn (tùy chọn, để 0 cũng được)
         yield return new WaitForSeconds(0.1f);
 
-        // Xóa cảnh báo và bắn Laze
-        Destroy(currentWarning);
+        // Xóa cảnh báo
+        Destroy(warnObj);
 
-        Vector3 laserSpawnPos = position + Vector3.up * laserSpawnHeight;
-        GameObject currentLaser = Instantiate(laserPrefab, laserSpawnPos, Quaternion.Euler(0, 0, 0));
+        // --- GIAI ĐOẠN 2: BẮN LAZE TẠI ĐIỂM NÀY ---
+        Vector3 spawnPos = position + Vector3.up * laserSpawnHeight;
+        GameObject laserObj = Instantiate(laserPrefab, spawnPos, Quaternion.identity);
 
-        yield return new WaitForSeconds(laserDuration);
-        Destroy(currentLaser);
+        // Laze tồn tại một chút rồi mất
+        yield return new WaitForSeconds(laserLifeTime);
+
+        Destroy(laserObj);
     }
 }
