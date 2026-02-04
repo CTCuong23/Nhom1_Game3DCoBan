@@ -15,6 +15,9 @@ public class BossLaserSkill : MonoBehaviour
     public AudioClip laserSound;
     [Range(0f, 1f)] public float soundVolume = 0.3f;
 
+    [Header("--- Cài đặt Số Đợt Bắn (MỚI) ---")]
+    public int wavesPerSkill = 15; // <-- Thay đổi số này trong Inspector
+
     [Header("--- Cài đặt Chung ---")]
     public float timeBetweenSkills = 5.0f; // Thời gian nghỉ giữa các skill
 
@@ -45,7 +48,7 @@ public class BossLaserSkill : MonoBehaviour
     IEnumerator BossBattleLoop()
     {
         // Chờ một chút trước khi bắt đầu
-        yield return new WaitForSeconds(3.0f);
+        yield return new WaitForSeconds(20f);
 
         while (true)
         {
@@ -83,8 +86,7 @@ public class BossLaserSkill : MonoBehaviour
     // Tách logic Laze cũ ra thành hàm riêng để gọn
     IEnumerator DoLaserSkill()
     {
-        // Bắn 3 đợt laze liên tục (hoặc tùy bạn chỉnh)
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < wavesPerSkill; i++)
         {
             SpawnMultiShotWave();
             yield return new WaitForSeconds(waveInterval);
