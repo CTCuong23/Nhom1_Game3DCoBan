@@ -12,10 +12,10 @@ public class PlayerStatsEditTests
     public void Setup()
     {
         playerObject = new GameObject("PlayerTest_EditMode");
-        
+
         // Dùng Reflection giống PlayMode để tránh lỗi mất tham chiếu Assembly
         playerStatsType = System.Type.GetType("PlayerStats, Assembly-CSharp");
-        
+
         if (playerStatsType == null)
         {
             Assert.Fail("Không tìm thấy component PlayerStats.");
@@ -27,11 +27,11 @@ public class PlayerStatsEditTests
         // Đặt max health và max stamina
         SetField("maxHealth", 100f);
         SetField("maxStamina", 100f);
-        
+
         // Trạng thái dàn dựng (Arrange): Nhân vật đang gần chết và kiệt sức
-        SetField("currentHealth", 10f); 
-        SetField("currentStamina", 5f); 
-        SetField("isInvincible", true); 
+        SetField("currentHealth", 10f);
+        SetField("currentStamina", 5f);
+        SetField("isInvincible", true);
     }
 
     [TearDown]
@@ -52,7 +52,7 @@ public class PlayerStatsEditTests
         var field = playerStatsType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         return (float)field.GetValue(playerStats);
     }
-    
+
     private bool GetBoolField(string fieldName)
     {
         var field = playerStatsType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -63,6 +63,12 @@ public class PlayerStatsEditTests
     {
         var method = playerStatsType.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         if (method != null) method.Invoke(playerStats, null);
+    }
+
+    private void CallMethodWithArgs(string methodName, object[] parameters)
+    {
+        var method = playerStatsType.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        if (method != null) method.Invoke(playerStats, parameters);
     }
     // --------------------------------------------------------
 
@@ -76,5 +82,33 @@ public class PlayerStatsEditTests
         Assert.AreEqual(100f, GetFloatField("currentHealth"), "Máu phải được hồi đầy về maxHealth.");
         Assert.AreEqual(100f, GetFloatField("currentStamina"), "Thể lực phải được hồi đầy về maxStamina.");
         Assert.AreEqual(false, GetBoolField("isInvincible"), "Trạng thái bất tử (cờ isInvincible) bắt buộc phải tắt.");
+    }
+
+    [Test]
+    public void TakeDamage_ReducesHealth_WhenNotInvincible()
+    {
+        // Arrange: Cài đặt máu 100 và tắt trạng thái bất tử
+        SetField("currentHealth", 100f);
+        SetField("isInvincible", false);
+
+        // Act: Gọi hàm TakeDamage nhận 20 sát thương
+        CallMethodWithArgs("TakeDamage", new object[] { 20f });
+
+        // Assert: Kiểm tra máu giảm đi 20 (còn 80)
+        Assert.AreEqual(80f, GetFloatField("currentHealth"), "Máu phải bị trừ đi 20 sau khi nhận sát thương.");
+    }
+
+    [Test]
+    public void Heal_IncreasesHealth_ButNotAboveMax()
+    {
+        // Arrange: Cài đặt máu tối đa là 100 và máu hiện tại là 90
+        SetField("maxHealth", 100f);
+        SetField("currentHealth", 90f);
+
+        // Act: Gọi hàm Heal để hồi 20 máu
+        CallMethodWithArgs("Heal", new object[] { 20f });
+
+        // Assert: Kiểm tra máu không vượt giới hạn maxHealth (tối đa là 100)
+        Assert.AreEqual(100f, GetFloatField("currentHealth"), "Máu phải được hồi nhưng không được vượt quá giới hạn maxHealth.");
     }
 }
