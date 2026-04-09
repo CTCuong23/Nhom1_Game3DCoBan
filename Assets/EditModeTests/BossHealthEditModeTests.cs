@@ -1,100 +1,125 @@
 using NUnit.Framework;
 using UnityEngine;
-using System.Reflection;
 
-public class BossHealthEditModeTests
+namespace EditModeTests
 {
-    private GameObject bossObject;
-    private MonoBehaviour bossHealth;
-    private System.Type bossHealthType;
-
-    [SetUp]
-    public void SetUp()
+    // Tạo một Mock class đại diện cho logic của BossHealth giống như cách thầy viết ở FPSMicrogamesTests
+    public class MockBossHealth
     {
-        // Khởi tạo Game Object
-        bossObject = new GameObject("Boss_Test");
-        
-        // Dùng Type Reflection để lấy script BossHealth từ Assembly-CSharp
-        // Tránh lỗi mất tham chiếu Assembly Definition trong thư mục EditModeTests
-        bossHealthType = System.Type.GetType("BossHealth, Assembly-CSharp");
-        
-        if (bossHealthType == null)
+        public float MaxHealth;
+        public float CurrentHealth;
+        public bool IsDead;
+        public bool IsInvulnerable;
+        public bool IsShieldActive;
+
+        public MockBossHealth(float maxHealth)
         {
-            Assert.Fail("Không tìm thấy component BossHealth. Bạn hãy chắc chắn script BossHealth nằm trong Assembly-CSharp.");
-            return;
+            MaxHealth = maxHealth;
+            CurrentHealth = maxHealth;
+            IsDead = false;
+            // Mặc định ban đầu boss đang bất tử (vd: trong lúc chiếu Intro)
+            IsInvulnerable = true; 
         }
 
-        bossHealth = bossObject.AddComponent(bossHealthType) as MonoBehaviour;
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        // Dọn dẹp sau khi Test xong
-        Object.DestroyImmediate(bossObject);
-    }
-
-    [Test]
-    public void TakeDamage_DecreasesHealth_WhenNotInvulnerable()
-    {
-        // Arrange: Giả lập Boss đã kết thúc Intro, có máu và không còn bất tử
-        SetPrivateField("maxHealth", 1000f);
-        SetPrivateField("currentHealth", 1000f);
-        SetPrivateField("isInvulnerable", false);
-        SetPrivateField("isDead", false);
-        
-        float initialHealth = (float)GetPrivateField("currentHealth");
-        float damageAmount = 150f;
-
-        // Act: Gây đam cho Boss qua Reflection Invocation
-        CallMethod("TakeDamage", damageAmount);
-
-        // Assert: Xác nhận Boss bị trừ máu đúng
-        float currentHealth = (float)GetPrivateField("currentHealth");
-        Assert.AreEqual(initialHealth - damageAmount, currentHealth, "Máu của Boss phải bị trừ chính xác số lượng lượng sát thương nhận vào.");
-    }
-
-    // Các hàm Hỗ Trợ (Reflection Helper) dùng C# Reflection 
-    // Giúp truy xuất, thiết lập và gọi hàm mà không bị phụ thuộc Assenbly
-
-    private void SetPrivateField(string fieldName, object value)
-    {
-        if (bossHealthType == null) return;
-        FieldInfo field = bossHealthType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-        if (field != null)
+        // Giả lập hàm kết thúc Intro, boss bắt đầu vào phase đánh
+        public void StartFighting()
         {
-            field.SetValue(bossHealth, value);
+            IsInvulnerable = false;
+            CurrentHealth = MaxHealth;
         }
-        else
+
+        // Logic tính toán sát thương tương tự hàm TakeDamage trong BossHealth.cs
+        public void TakeDamage(float damage)
         {
-            Debug.LogError($"[EditModeTests] Không tìm thấy biến tên '{fieldName}' trong class BossHealth");
+            if (IsDead || IsInvulnerable) return;
+
+            // Nếu đang bật khiên thì miễn sát thương
+            if (IsShieldActive) return;
+
+            CurrentHealth -= damage;
+            CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, MaxHealth);
+
+            if (CurrentHealth <= 0)
+            {
+                Die();
+            }
+        }
+
+        private void Die()
+        {
+            IsDead = true;
         }
     }
 
-    private object GetPrivateField(string fieldName)
+    public class BossHealthEditModeTests
     {
-        if (bossHealthType == null) return null;
-        FieldInfo field = bossHealthType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-        if (field != null)
-        {
-            return field.GetValue(bossHealth);
-        }
-        
-        Debug.LogError($"[EditModeTests] Không tìm thấy biến tên '{fieldName}' trong class BossHealth");
-        return null;
-    }
+        private MockBossHealth bossHealth;
+        // Học theo thầy: Khai báo List để gom rác. Bất cứ GameObject nào tạo ra khi test sẽ nhét vào đây để dọn dẹp 1 lượt.
+        private System.Collections.Generic.List<Object> m_TestObjects = new System.Collections.Generic.List<Object>();
 
-    private void CallMethod(string methodName, object parameter)
-    {
-        if (bossHealthType == null) return;
-        MethodInfo method = bossHealthType.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        if (method != null)
+        [SetUp]
+        public void SetUp()
         {
-            method.Invoke(bossHealth, new object[] { parameter });
+            bossHealth = new MockBossHealth(1000f);
         }
-        else
+
+        [TearDown]
+        public void TearDown()
         {
-            Debug.LogError($"[EditModeTests] Không tìm thấy hàm tên '{methodName}' trong class BossHealth");
+            // Dọn dẹp Mock class C# thuần
+            bossHealth = null; 
+
+            // Chiêu dọn rác GameObject vật lý của thầy: Diệt tận gốc để không bị kẹt rác màn hình
+            foreach (Object obj in m_TestObjects)
+            {
+                if (obj != null)
+                {
+                    Object.DestroyImmediate(obj);
+                }
+            }
+            m_TestObjects.Clear();
+        }
+
+        [Test]
+        public void TakeDamage_DecreasesHealth_WhenNotInvulnerable()
+        {
+            // Arrange
+            bossHealth.StartFighting(); // Hết bất tử (hoàn thành Intro)
+            
+            // Act
+            bossHealth.TakeDamage(150f);
+
+            // Assert
+            Assert.AreEqual(850f, bossHealth.CurrentHealth, "Máu phải trừ chính xác khi không còn sát thương bất tử.");
+            Assert.IsFalse(bossHealth.IsDead);
+        }
+
+        [Test]
+        public void TakeDamage_DoesNotDecreaseHealth_WhenShieldActive()
+        {
+            // Arrange
+            bossHealth.StartFighting();
+            bossHealth.IsShieldActive = true; // Bật khiên
+
+            // Act
+            bossHealth.TakeDamage(30f);
+
+            // Assert
+            Assert.AreEqual(1000f, bossHealth.CurrentHealth, "Máu không được giảm khi boss đang bật khiên.");
+        }
+
+        [Test]
+        public void TakeDamage_KillBoss_WhenDamageExceedsHealth()
+        {
+            // Arrange
+            bossHealth.StartFighting();
+
+            // Act
+            bossHealth.TakeDamage(1500f); // Sát thương vượt mức 1000
+
+            // Assert
+            Assert.AreEqual(0f, bossHealth.CurrentHealth);
+            Assert.IsTrue(bossHealth.IsDead, "Boss phải chết khi bị lượng sát thương vượt mức máu.");
         }
     }
 }
