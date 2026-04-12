@@ -111,4 +111,32 @@ public class PlayerStatsEditTests
         // Assert: Kiểm tra máu không vượt giới hạn maxHealth (tối đa là 100)
         Assert.AreEqual(100f, GetFloatField("currentHealth"), "Máu phải được hồi nhưng không được vượt quá giới hạn maxHealth.");
     }
+
+    [Test]
+    public void TakeDamage_WhenInvincible_ShouldNotReduceHealth()
+    {
+        // Arrange: Nhân vật có 80 máu, bật trạng thái bất tử
+        SetField("currentHealth", 80f);
+        SetField("isInvincible", true);
+
+        // Act: Đóng gói lại gọi hàm TakeDamage nhận 15 sát thương
+        CallMethodWithArgs("TakeDamage", new object[] { 15f });
+
+        // Assert: Máu phải còn giữ nguyên không suy suyển
+        Assert.AreEqual(80f, GetFloatField("currentHealth"), "Máu không bị trừ do nhân vật đang trong trạng thái bất tử (isInvincible=true).");
+    }
+
+    [Test]
+    public void TakeDamage_WhenAlreadyDead_ShouldNotGoBelowZero()
+    {
+        // Arrange: Người chơi đã chết (máu bằng 0), đã tắt bất tử
+        SetField("currentHealth", 0f);
+        SetField("isInvincible", false);
+
+        // Act: Tiếp tục gọi hàm nhận thêm sát thương (VD: thi thể bị đánh)
+        CallMethodWithArgs("TakeDamage", new object[] { 30f });
+
+        // Assert: Máu không được rớt xuống mức âm, đứng im ở 0
+        Assert.AreEqual(0f, GetFloatField("currentHealth"), "Máu không được rớt xuống mức âm, hàm TakeDamage phải tự chặn khi máu đã là 0.");
+    }
 }
