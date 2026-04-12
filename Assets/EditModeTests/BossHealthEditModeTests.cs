@@ -121,5 +121,34 @@ namespace EditModeTests
             Assert.AreEqual(0f, bossHealth.CurrentHealth);
             Assert.IsTrue(bossHealth.IsDead, "Boss phải chết khi bị lượng sát thương vượt mức máu.");
         }
+
+        [Test]
+        public void TakeDamage_DoesNotDecreaseHealth_WhenInvulnerable()
+        {
+            // Arrange
+            // Không gọi StartFighting(), boss mặc định đang bất tử (IsInvulnerable = true)
+
+            // Act
+            bossHealth.TakeDamage(100f);
+
+            // Assert
+            Assert.AreEqual(1000f, bossHealth.CurrentHealth, "Máu không được giảm khi boss đang trong trạng thái bất tử (Intro).");
+            Assert.IsFalse(bossHealth.IsDead);
+        }
+
+        [Test]
+        public void TakeDamage_DoesNotTakeEffect_WhenAlreadyDead()
+        {
+            // Arrange
+            bossHealth.StartFighting();
+            bossHealth.TakeDamage(1000f); // Giết boss
+
+            // Act
+            bossHealth.TakeDamage(500f); // Gây thêm sát thương khi đã chết
+
+            // Assert
+            Assert.AreEqual(0f, bossHealth.CurrentHealth, "Máu rớt xuống dưới 0 vẫn sẽ bị giới hạn ở 0.");
+            Assert.IsTrue(bossHealth.IsDead, "Boss vẫn phải duy trì trạng thái chết.");
+        }
     }
 }
