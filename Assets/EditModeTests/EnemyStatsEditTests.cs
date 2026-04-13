@@ -120,4 +120,35 @@ public class EnemyStatsEditTests
         // Assert: Quái vật phải chuyển sang trạng thái isDead
         Assert.IsTrue(GetBoolField("isDead"), "Quái vật phải chết (isDead = true) khi chịu một đòn kết liễu.");
     }
+
+    [Test]
+    public void TakeDamage_IgnoresDamage_WhenAlreadyDead()
+    {
+        // Arrange: Giả lập quái vật ĐÃ CHẾT và máu đã tụt về 0
+        SetField("isDead", true);
+        SetField("currentHealth", 0f);
+
+        // Act: Người chơi vẫn cố tình chém thêm vào xác quái
+        CallMethodWithArgs("TakeDamage", new object[] { 999f });
+
+        // Assert: Lệnh TakeDamage chứa dòng "if (isDead) return;", máu không bị tụt xuống âm
+        Assert.AreEqual(0f, GetFloatField("currentHealth"), "Máu không được phép giảm thêm (tránh bị lỗi số âm) nếu quái vật đã chết.");
+    }
+
+    [Test]
+    public void TakeDamage_DisablesEnemyCollider_UponDeath()
+    {
+        // Arrange: Bật Collider của quái vật lên và set máu yếu
+        BoxCollider col = enemyObject.GetComponent<BoxCollider>();
+        col.enabled = true;
+        SetField("currentHealth", 10f);
+        SetField("isDead", false);
+        SetField("lastHitTime", 9999f);
+
+        // Act: Chém bạo kích hạ gục quái vật (sẽ tự động kích hoạt hàm Die() bên trong mã gốc)
+        CallMethodWithArgs("TakeDamage", new object[] { 100f });
+
+        // Assert: Lệnh Die() bắt buộc phải tắt Collider đi (GetComponent<Collider>().enabled = false)
+        Assert.IsFalse(col.enabled, "Collider của quái vật phải tự động bị tắt đi khi tử vong để đạn/người chơi đi xuyên qua cái xác.");
+    }
 }
