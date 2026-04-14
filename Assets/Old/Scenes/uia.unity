@@ -3627,12 +3627,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
-  currentHealth: 0
   anchorAudioSource: {fileID: 235944907}
   breakSounds:
   - {fileID: 8300000, guid: 4996fe1cf35250d4b8642eb77b69e70c, type: 3}
   - {fileID: 8300000, guid: 1ddef23025744ef41934682e617117ec, type: 3}
-  explosionVFX: {fileID: 0}
+  bossShieldManager: {fileID: 0}
 --- !u!135 &145148390
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -14365,6 +14364,7 @@ MonoBehaviour:
   deathPanel: {fileID: 0}
   maxHealth: 100
   currentHealth: 0
+  invincibilityDuration: 1.5
   maxStamina: 100
   staminaDrainRate: 10
   staminaRegenRate: 19
@@ -26130,12 +26130,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
-  currentHealth: 0
   anchorAudioSource: {fileID: 235944907}
   breakSounds:
   - {fileID: 8300000, guid: 4996fe1cf35250d4b8642eb77b69e70c, type: 3}
   - {fileID: 8300000, guid: 1ddef23025744ef41934682e617117ec, type: 3}
-  explosionVFX: {fileID: 0}
+  bossShieldManager: {fileID: 0}
 --- !u!135 &954709741
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -29216,9 +29215,8 @@ MonoBehaviour:
   warningZonePrefab: {fileID: 6180285442270272971, guid: 41458ce18a29f1f4a96e1145f792d9f0, type: 3}
   laserPrefab: {fileID: 2246685446089524492, guid: b5c118f3747ec604bb80958493e9536d, type: 3}
   wavesPerSkill: 3
-  timeBetweenSkills: 3
-  waveInterval: 3
   lasersPerWave: 200
+  waveInterval: 3
   warningDuration: 2
   laserLifeTime: 1
   warningSize: 1.5
@@ -29228,6 +29226,7 @@ MonoBehaviour:
   maxX: 182.18
   minZ: 409.89
   maxZ: 459.26
+  timeBetweenSkills: 3
   audioSource: {fileID: 235944907}
   warningSound: {fileID: 8300000, guid: 4bfeea10e334ec7448298cccb098f4e5, type: 3}
   laserSound: {fileID: 8300000, guid: 308de6a7daa6cb24ca3c505df338bc7b, type: 3}
@@ -44952,12 +44951,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
-  currentHealth: 0
   anchorAudioSource: {fileID: 235944907}
   breakSounds:
   - {fileID: 8300000, guid: 4996fe1cf35250d4b8642eb77b69e70c, type: 3}
   - {fileID: 8300000, guid: 1ddef23025744ef41934682e617117ec, type: 3}
-  explosionVFX: {fileID: 0}
+  bossShieldManager: {fileID: 0}
 --- !u!135 &1543542629
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -46935,12 +46933,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
-  currentHealth: 0
   anchorAudioSource: {fileID: 235944907}
   breakSounds:
   - {fileID: 8300000, guid: 4996fe1cf35250d4b8642eb77b69e70c, type: 3}
   - {fileID: 8300000, guid: 1ddef23025744ef41934682e617117ec, type: 3}
-  explosionVFX: {fileID: 0}
+  bossShieldManager: {fileID: 0}
 --- !u!135 &1629025158
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -50066,12 +50063,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
-  currentHealth: 0
   anchorAudioSource: {fileID: 235944907}
   breakSounds:
   - {fileID: 8300000, guid: 4996fe1cf35250d4b8642eb77b69e70c, type: 3}
   - {fileID: 8300000, guid: 1ddef23025744ef41934682e617117ec, type: 3}
-  explosionVFX: {fileID: 0}
+  bossShieldManager: {fileID: 0}
 --- !u!135 &1764010213
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -52406,12 +52402,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
-  currentHealth: 0
   anchorAudioSource: {fileID: 235944907}
   breakSounds:
   - {fileID: 8300000, guid: 4996fe1cf35250d4b8642eb77b69e70c, type: 3}
   - {fileID: 8300000, guid: 1ddef23025744ef41934682e617117ec, type: 3}
-  explosionVFX: {fileID: 0}
+  bossShieldManager: {fileID: 0}
 --- !u!135 &1857237081
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -53415,12 +53410,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1
-  currentHealth: 0
   anchorAudioSource: {fileID: 235944907}
   breakSounds:
   - {fileID: 8300000, guid: 4996fe1cf35250d4b8642eb77b69e70c, type: 3}
   - {fileID: 8300000, guid: 1ddef23025744ef41934682e617117ec, type: 3}
-  explosionVFX: {fileID: 0}
+  bossShieldManager: {fileID: 0}
 --- !u!135 &1879190070
 SphereCollider:
   m_ObjectHideFlags: 0
