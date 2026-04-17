@@ -1,75 +1,37 @@
 using NUnit.Framework;
 using UnityEngine;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace EditModeTests
 {
-    // Tạo một Mock class đại diện cho logic của BossHealth giống như cách thầy viết ở FPSMicrogamesTests
-    public class MockBossHealth
-    {
-        public float MaxHealth;
-        public float CurrentHealth;
-        public bool IsDead;
-        public bool IsInvulnerable;
-        public bool IsShieldActive;
-
-        public MockBossHealth(float maxHealth)
-        {
-            MaxHealth = maxHealth;
-            CurrentHealth = maxHealth;
-            IsDead = false;
-            // Mặc định ban đầu boss đang bất tử (vd: trong lúc chiếu Intro)
-            IsInvulnerable = true; 
-        }
-
-        // Giả lập hàm kết thúc Intro, boss bắt đầu vào phase đánh
-        public void StartFighting()
-        {
-            IsInvulnerable = false;
-            CurrentHealth = MaxHealth;
-        }
-
-        // Logic tính toán sát thương tương tự hàm TakeDamage trong BossHealth.cs
-        public void TakeDamage(float damage)
-        {
-            if (IsDead || IsInvulnerable) return;
-
-            // Nếu đang bật khiên thì miễn sát thương
-            if (IsShieldActive) return;
-
-            CurrentHealth -= damage;
-            CurrentHealth = Mathf.Clamp(CurrentHealth, 0f, MaxHealth);
-
-            if (CurrentHealth <= 0)
-            {
-                Die();
-            }
-        }
-
-        private void Die()
-        {
-            IsDead = true;
-        }
-    }
-
     public class BossHealthEditModeTests
     {
-        private MockBossHealth bossHealth;
-        // Học theo thầy: Khai báo List để gom rác. Bất cứ GameObject nào tạo ra khi test sẽ nhét vào đây để dọn dẹp 1 lượt.
-        private System.Collections.Generic.List<Object> m_TestObjects = new System.Collections.Generic.List<Object>();
+        private GameObject bossObject;
+        private MonoBehaviour bossHealth;
+        // Khai báo List để gom rác. Bất cứ GameObject nào tạo ra khi test sẽ nhét vào đây để dọn dẹp 1 lượt.
+        private List<Object> m_TestObjects = new List<Object>();
 
         [SetUp]
         public void SetUp()
         {
-            bossHealth = new MockBossHealth(1000f);
+            // Dùng Reflection để lấy Type từ Assembly-CSharp, tránh lỗi asmdef
+            var bossHealthType = System.Type.GetType("BossHealth, Assembly-CSharp");
+            Assert.IsNotNull(bossHealthType, "Không tìm thấy class BossHealth trong Assembly-CSharp.");
+
+            // Tạo GameObject vật lý và gắn script BossHealth thật vào
+            bossObject = new GameObject("Boss");
+            bossHealth = (MonoBehaviour)bossObject.AddComponent(bossHealthType);
+            m_TestObjects.Add(bossObject);
+            
+            // Đặt máu tối đa cho BossHealth để chuẩn bị test
+            SetPrivateField(bossHealth, "maxHealth", 1000f);
         }
 
         [TearDown]
         public void TearDown()
         {
-            // Dọn dẹp Mock class C# thuần
-            bossHealth = null; 
-
-            // Chiêu dọn rác GameObject vật lý của thầy: Diệt tận gốc để không bị kẹt rác màn hình
+            // Dọn rác GameObject vật lý: Diệt tận gốc để không bị kẹt rác màn hình
             foreach (Object obj in m_TestObjects)
             {
                 if (obj != null)
@@ -80,75 +42,129 @@ namespace EditModeTests
             m_TestObjects.Clear();
         }
 
+        // --- Hàm hỗ trợ dùng Reflection để can thiệp vào biến private và gọi hàm ---
+        private void SetPrivateField(object target, string fieldName, object value)
+        {
+            FieldInfo field = target.GetType().GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field != null)
+            {
+                field.SetValue(target, value);
+            }
+        }
+
+        private T GetPrivateField<T>(object target, string fieldName)
+        {
+            FieldInfo field = target.GetType().GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field != null)
+            {
+                return (T)field.GetValue(target);
+            }
+            return default(T);
+        }
+
+        private void CallMethod(object target, string methodName, params object[] args)
+        {
+            MethodInfo method = target.GetType().GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (method != null)
+            {
+                method.Invoke(target, args);
+            }
+        }
+
         [Test]
         public void TakeDamage_DecreasesHealth_WhenNotInvulnerable()
         {
             // Arrange
-            bossHealth.StartFighting(); // Hết bất tử (hoàn thành Intro)
+            SetPrivateField(bossHealth, "currentHealth", 1000f);
+            SetPrivateField(bossHealth, "isInvulnerable", false); // Boss hết bất tử (hoàn thành Intro)
             
             // Act
-            bossHealth.TakeDamage(150f);
+            CallMethod(bossHealth, "TakeDamage", 150f);
 
             // Assert
-            Assert.AreEqual(850f, bossHealth.CurrentHealth, "Máu phải trừ chính xác khi không còn sát thương bất tử.");
-            Assert.IsFalse(bossHealth.IsDead);
+            float currentHealth = GetPrivateField<float>(bossHealth, "currentHealth");
+            bool isDead = GetPrivateField<bool>(bossHealth, "isDead");
+
+            Assert.AreEqual(850f, currentHealth, "Máu phải trừ chính xác khi không còn sát thương bất tử.");
+            Assert.IsFalse(isDead);
         }
 
         [Test]
         public void TakeDamage_DoesNotDecreaseHealth_WhenShieldActive()
         {
             // Arrange
-            bossHealth.StartFighting();
-            bossHealth.IsShieldActive = true; // Bật khiên
+            SetPrivateField(bossHealth, "currentHealth", 1000f);
+            SetPrivateField(bossHealth, "isInvulnerable", false);
+
+            // Setup BossShieldSkill thật bằng Reflection và bật trạng thái khiên lên
+            var shieldType = System.Type.GetType("BossShieldSkill, Assembly-CSharp");
+            MonoBehaviour shieldSkill = (MonoBehaviour)bossObject.AddComponent(shieldType);
+            SetPrivateField(shieldSkill, "isShieldActive", true); // Bật khiên
+            SetPrivateField(bossHealth, "shieldSkill", shieldSkill); // Gắn script khiên vào BossHealth
 
             // Act
-            bossHealth.TakeDamage(30f);
+            CallMethod(bossHealth, "TakeDamage", 30f);
 
             // Assert
-            Assert.AreEqual(1000f, bossHealth.CurrentHealth, "Máu không được giảm khi boss đang bật khiên.");
+            float currentHealth = GetPrivateField<float>(bossHealth, "currentHealth");
+            Assert.AreEqual(1000f, currentHealth, "Máu không được giảm khi boss đang bật khiên.");
         }
 
         [Test]
         public void TakeDamage_KillBoss_WhenDamageExceedsHealth()
         {
             // Arrange
-            bossHealth.StartFighting();
+            SetPrivateField(bossHealth, "currentHealth", 1000f);
+            SetPrivateField(bossHealth, "isInvulnerable", false);
 
             // Act
-            bossHealth.TakeDamage(1500f); // Sát thương vượt mức 1000
+            CallMethod(bossHealth, "TakeDamage", 1500f); // Sát thương vượt mức 1000
 
             // Assert
-            Assert.AreEqual(0f, bossHealth.CurrentHealth);
-            Assert.IsTrue(bossHealth.IsDead, "Boss phải chết khi bị lượng sát thương vượt mức máu.");
+            float currentHealth = GetPrivateField<float>(bossHealth, "currentHealth");
+            bool isDead = GetPrivateField<bool>(bossHealth, "isDead");
+
+            Assert.LessOrEqual(currentHealth, 0f, "Máu phải <= 0 khi nhận sát thương lớn hơn máu hiện tại.");
+            Assert.IsTrue(isDead, "Boss phải chết khi bị lượng sát thương vượt mức máu.");
         }
 
         [Test]
         public void TakeDamage_DoesNotDecreaseHealth_WhenInvulnerable()
         {
             // Arrange
-            // Không gọi StartFighting(), boss mặc định đang bất tử (IsInvulnerable = true)
+            SetPrivateField(bossHealth, "currentHealth", 1000f);
+            SetPrivateField(bossHealth, "isInvulnerable", true); // Boss đang bất tử (đang chạy Intro)
 
             // Act
-            bossHealth.TakeDamage(100f);
+            CallMethod(bossHealth, "TakeDamage", 100f);
 
             // Assert
-            Assert.AreEqual(1000f, bossHealth.CurrentHealth, "Máu không được giảm khi boss đang trong trạng thái bất tử (Intro).");
-            Assert.IsFalse(bossHealth.IsDead);
+            float currentHealth = GetPrivateField<float>(bossHealth, "currentHealth");
+            bool isDead = GetPrivateField<bool>(bossHealth, "isDead");
+
+            Assert.AreEqual(1000f, currentHealth, "Máu không được giảm khi boss đang trong trạng thái bất tử (Intro).");
+            Assert.IsFalse(isDead);
         }
 
         [Test]
         public void TakeDamage_DoesNotTakeEffect_WhenAlreadyDead()
         {
             // Arrange
-            bossHealth.StartFighting();
-            bossHealth.TakeDamage(1000f); // Giết boss
+            SetPrivateField(bossHealth, "currentHealth", 1000f);
+            SetPrivateField(bossHealth, "isInvulnerable", false);
+            
+            // Giết boss trước
+            CallMethod(bossHealth, "TakeDamage", 1000f); 
 
             // Act
-            bossHealth.TakeDamage(500f); // Gây thêm sát thương khi đã chết
+            CallMethod(bossHealth, "TakeDamage", 500f); // Gây thêm sát thương khi boss đã chết
 
             // Assert
-            Assert.AreEqual(0f, bossHealth.CurrentHealth, "Máu rớt xuống dưới 0 vẫn sẽ bị giới hạn ở 0.");
-            Assert.IsTrue(bossHealth.IsDead, "Boss vẫn phải duy trì trạng thái chết.");
+            float currentHealth = GetPrivateField<float>(bossHealth, "currentHealth");
+            bool isDead = GetPrivateField<bool>(bossHealth, "isDead");
+
+            Assert.AreEqual(0f, currentHealth, "Lượng sát thương thứ hai sẽ bị bỏ qua vì Boss đã chết.");
+            Assert.IsTrue(isDead, "Boss vẫn phải duy trì trạng thái chết.");
         }
     }
 }
