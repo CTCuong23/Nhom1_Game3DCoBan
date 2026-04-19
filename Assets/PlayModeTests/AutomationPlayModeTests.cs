@@ -5,13 +5,10 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-/// <summary>
-/// 5 Automation PlayMode Tests (Đảm bảo KHÔNG trùng lặp với các test logic hiện có của dự án).
-/// Các Test Cases tham chiếu trực tiếp logic hàm gốc bằng Reflection (để vượt qua rào cản Assembly Definition).
-/// </summary>
+
 public class AutomationPlayModeTests
 {
-    // ================== HELPER METHODS ==================
+
     private static void SetPrivateField(object target, string fieldName, object value)
     {
         FieldInfo field = target.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
@@ -30,8 +27,8 @@ public class AutomationPlayModeTests
     }
     // ====================================================
 
-    [Test]
-    public void PowerManager_CutPower_DisablesLights_And_SetsPowerOffFlag()
+    [UnityTest]
+    public IEnumerator PowerManager_CutPower_DisablesLights_And_SetsPowerOffFlag()
     {
         System.Type powerManagerType = System.Type.GetType("PowerManager, Assembly-CSharp");
         Assert.IsNotNull(powerManagerType, "Không tìm thấy class PowerManager trong Assembly-CSharp.");
@@ -53,10 +50,11 @@ public class AutomationPlayModeTests
 
         GameObject.DestroyImmediate(pmObj);
         GameObject.DestroyImmediate(lightObj);
+        yield return null;
     }
 
-    [Test]
-    public void PowerManager_RestorePower_EnablesLights_And_ResetsTimer()
+    [UnityTest]
+    public IEnumerator PowerManager_RestorePower_EnablesLights_And_ResetsTimer()
     {
         System.Type powerManagerType = System.Type.GetType("PowerManager, Assembly-CSharp");
         Assert.IsNotNull(powerManagerType, "Không tìm thấy class PowerManager trong Assembly-CSharp.");
@@ -85,10 +83,11 @@ public class AutomationPlayModeTests
 
         GameObject.DestroyImmediate(pmObj);
         GameObject.DestroyImmediate(lightObj);
+        yield return null;
     }
 
-    [Test]
-    public void FlashlightController_PickupFlashlight_EnablesLightSource_And_SetsFlag()
+    [UnityTest]
+    public IEnumerator FlashlightController_PickupFlashlight_EnablesLightSource_And_SetsFlag()
     {
         System.Type fcType = System.Type.GetType("FlashlightController, Assembly-CSharp");
         Assert.IsNotNull(fcType, "Không tìm thấy class FlashlightController.");
@@ -109,10 +108,11 @@ public class AutomationPlayModeTests
 
         GameObject.DestroyImmediate(fcObj);
         GameObject.DestroyImmediate(lightObj);
+        yield return null;
     }
 
-    [Test]
-    public void GameManager_ToggleKeypadMode_SetsCursorVisible_And_DisablesMovement()
+    [UnityTest]
+    public IEnumerator GameManager_ToggleKeypadMode_SetsCursorVisible_And_DisablesMovement()
     {
         System.Type gmType = System.Type.GetType("GameManager, Assembly-CSharp");
         Assert.IsNotNull(gmType, "Không tìm thấy class GameManager.");
@@ -139,10 +139,11 @@ public class AutomationPlayModeTests
 
         GameObject.DestroyImmediate(gmObj);
         GameObject.DestroyImmediate(playerObj);
+        yield return null;
     }
 
-    [Test]
-    public void Login_Logout_ClearsPlayerPrefs_And_ResetsSkipLogin()
+    [UnityTest]
+    public IEnumerator Login_Logout_ClearsPlayerPrefs_And_ResetsSkipLogin()
     {
         System.Type loginType = System.Type.GetType("Login, Assembly-CSharp");
         Assert.IsNotNull(loginType, "Không tìm thấy class Login.");
@@ -163,5 +164,6 @@ public class AutomationPlayModeTests
         
         bool isSkipLogin = (bool)skipLoginField.GetValue(null);
         Assert.IsFalse(isSkipLogin, "Biến kiểm thử SkipLogin không được hoàn nguyên, sẽ sinh lỗi phiên sau.");
+        yield return null;
     }
 }
